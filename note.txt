@@ -1,0 +1,5 @@
+a faire : 	regle makefile qui appelle le makefile de la libft		//done
+			ne pas oublier de free params
+			il faudra revoir dans split si il manque des free et checker les leaks de split
+			vérifier collision avec les murs
+			peut-être faire directement un tableau de double à la place d'un tableau de int pour posx et posy
