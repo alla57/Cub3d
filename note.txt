@@ -10,8 +10,6 @@ a faire : 	regle makefile qui appelle le makefile de la libft		//done
 			https://lodev.org/cgtutor/raycasting.html
 			https://github.com/42Paris/minilibx-linux
 			https://github.com/42Paris/norminette
-			https://profile.intra.42.fr/#
-			https://cdn.intra.42.fr/pdf/pdf/13539/fr.subject.pdf
 			https://docs.github.com/en/enterprise/2.17/user/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
 			https://clockify.me/tracker
 			https://evernote.com/intl/fr/logged-out/?logout=&uid=197465962
