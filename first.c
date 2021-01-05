@@ -310,7 +310,7 @@ int hit_north(tools *tool)
 
 	if (tool->map[y - 1][x] == '1')
 	{
-		if ((tool->posy - tool->speed) >= (y))
+		if ((tool->posy - tool->speed) <= (y))
 			return (1);
 	}
 	return (0);
@@ -325,7 +325,7 @@ int hit_south(tools *tool)
 	x = (int)tool->posx;
 	if (tool->map[y + 1][x] == '1')
 	{
-		if ((tool->posy + tool->speed) >= (y))
+		if ((tool->posy + tool->speed) >= (y + 1))
 			return (1);
 	}
 	return (0);
@@ -340,7 +340,7 @@ int hit_east(tools *tool)
 	x = (int)tool->posx;
 	if (tool->map[y][x + 1] == '1')
 	{
-		if ((tool->posx + tool->speed) >= (x))
+		if ((tool->posx + tool->speed) >= (x + 1))
 			return (1);
 	}
 	return (0);
