@@ -21,7 +21,7 @@ void struct_ini(tools *tool)
 	tool->mlx_ptr = mlx_init();
 	tool->win_ptr = mlx_new_window(tool->mlx_ptr, tool->res_x, tool->res_y, tool->title);
 	tool->img_ptr = mlx_xpm_file_to_image(tool->mlx_ptr, "eagle.xpm", &tool->width, &tool->height);
-	tool->speed = 0.05;
+	tool->speed = 0.1;
 	tool->pos_player[0] = 11;
 	tool->pos_player[1] = 9;
 }
@@ -310,7 +310,7 @@ int hit_north(tools *tool)
 
 	if (tool->map[y - 1][x] == '1')
 	{
-		if ((tool->posy - tool->speed) >= (y))
+		if ((tool->posy - tool->speed) <= (y))
 			return (1);
 	}
 	return (0);
@@ -325,7 +325,7 @@ int hit_south(tools *tool)
 	x = (int)tool->posx;
 	if (tool->map[y + 1][x] == '1')
 	{
-		if ((tool->posy + tool->speed) >= (y))
+		if ((tool->posy + tool->speed) >= (y + 1))
 			return (1);
 	}
 	return (0);
@@ -340,7 +340,7 @@ int hit_east(tools *tool)
 	x = (int)tool->posx;
 	if (tool->map[y][x + 1] == '1')
 	{
-		if ((tool->posx + tool->speed) >= (x))
+		if ((tool->posx + tool->speed) >= (x + 1))
 			return (1);
 	}
 	return (0);
