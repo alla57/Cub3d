@@ -14,3 +14,4 @@ a faire : 	regle makefile qui appelle le makefile de la libft		//done
 			https://clockify.me/tracker
 			https://evernote.com/intl/fr/logged-out/?logout=&uid=197465962
 			
+			Il faudra faire un malloc puis un memcpy de img_ptrnew dans img_ptrnew2 pour refresh l'image.

@@ -223,7 +223,7 @@ void create_grid(tools* tool)
 	case_len = tool->res_x / max_x < tool->res_y / tool->max_y ? tool->res_x / max_x : tool->res_y / tool->max_y;
 	tool->case_len = case_len;
 	coloring_cases(tool, case_len, max_x);
-	display_player(tool);
+	//display_player(tool);
 	y = 0;
 	j = 0;
 	while (y < tool->res_y)
@@ -388,8 +388,9 @@ void move_player(tools *tool)
 	}
 	if (tool->keyup || tool->keydown || tool->keyleft || tool->keyright)
 	{
+		tool->img_ptrnew = tool->img_ptrnew2;
 		display_player(tool);
-		mlx_put_image_to_window(tool->mlx_ptr, tool->win_ptr, tool->img_ptrnew, 0, 0);
+		mlx_put_image_to_window(tool->mlx_ptr, tool->win_ptr, tool->img_ptrnew2, 0, 0);
 		printf("x = %f y = %f\n", tool->posx, tool->posy);
 		//refresh(tool);
 	}
@@ -449,6 +450,9 @@ int main(int ac, char *av[])
 	create_background(&tool, tool.c_color);
 	init_player_pos(&tool);
 	create_grid(&tool);
+	tool.img_ptrnew2 = mlx_new_image(tool.mlx_ptr, 1920, 1080);
+	tool.img_ptrnew2 = tool.img_ptrnew;
+	display_player(&tool);
 	mlx_put_image_to_window(tool.mlx_ptr, tool.win_ptr, tool.img_ptrnew, 0, 0);
 	mlx_hook(tool.win_ptr, 2, 1L<<0, press, &tool);
 	mlx_hook(tool.win_ptr, 3, 1L<<1, release, &tool);

@@ -19,6 +19,7 @@ typedef struct
 	void	*win_ptr;
 	void	*img_ptr;
 	void	*img_ptrnew;//////////// a supprimer plus tard
+	void	*img_ptrnew2; //// a supprimer
 	char	*no_path;
 	char	*so_path;
 	char	*ea_path;
