@@ -1,4 +1,6 @@
-#include "./minilibx-linux/mlx.h"
+//#include "./minilibx-linux/mlx.h"
+//#include "minilibx-mac-osx/mlx.h"
+#include "minilibx_opengl_20191021/mlx.h"
 #include <stdio.h>
 #include <unistd.h>
 #include "include/cub3d.h"
@@ -62,10 +64,10 @@ void create_img_addr(tools *tool)
 void create_background(tools *tool, int color)
 {
 	tool->pos_x = 0;
-	while (tool->pos_x <= 1920)
+	while (tool->pos_x < 1920)
 	{
 		tool->pos_y = 0;
-		while (tool->pos_y <= 1080)
+		while (tool->pos_y < 1080)
 		{
 			my_mlx_pixel_put(tool, tool->pos_x, tool->pos_y, color);
 			++tool->pos_y;
@@ -248,14 +250,14 @@ void create_grid(tools* tool)
 		++j;
 	}
 }
-
+/*
 int resize(tools *tool) //old
 {
 	mlx_get_screen_size(tool->mlx_ptr, &tool->res_x, &tool->res_y);
 	tool->win_ptr = mlx_new_window(tool->mlx_ptr, tool->res_x, tool->res_y, tool->title);
 	return (1);
 }
-
+*/
 
 void move_forward(tools *tool)
 {
@@ -388,9 +390,10 @@ void move_player(tools *tool)
 	}
 	if (tool->keyup || tool->keydown || tool->keyleft || tool->keyright)
 	{
-		tool->img_ptrnew = tool->img_ptrnew2;
+		//tool->img_ptrnew = tool->img_ptrnew2;
+		memcpy(tool->img_ptrnew, tool->img_ptrnew2, tool->bits_per_pixel);
 		display_player(tool);
-		mlx_put_image_to_window(tool->mlx_ptr, tool->win_ptr, tool->img_ptrnew2, 0, 0);
+		mlx_put_image_to_window(tool->mlx_ptr, tool->win_ptr, tool->img_ptrnew, 0, 0);
 		printf("x = %f y = %f\n", tool->posx, tool->posy);
 		//refresh(tool);
 	}
@@ -398,13 +401,13 @@ void move_player(tools *tool)
 
 int 	press(int keycode, tools *tool) //old
 {
-	if (keycode == 122)
+	if (keycode == 13) //13 122
 		tool->keyup = 1;
-	if (keycode == 113)
+	if (keycode == 0) //0 113
 		tool->keyleft = 1;
-	if (keycode == 115)
+	if (keycode == 1) //1 115
 		tool->keydown = 1;
-	if (keycode == 100)
+	if (keycode == 2) //2 100
 		tool->keyright = 1;
 	move_player(tool);
 	printf("je suis dans press et le keycode est %d\n", keycode);
@@ -413,13 +416,13 @@ int 	press(int keycode, tools *tool) //old
 
 int		release(int keycode, tools *tool) //old
 {
-	if (keycode == 122)
+	if (keycode == 13) //13 122
 		tool->keyup = 0;
-	if (keycode == 113)
+	if (keycode == 0) //0 113
 		tool->keyleft = 0;
-	if (keycode == 115)
+	if (keycode == 1) //1 115
 		tool->keydown = 0;
-	if (keycode == 100)
+	if (keycode == 2) //2 100
 		tool->keyright = 0;
 	printf("keyrelease\n");
 	return 1;
@@ -446,12 +449,14 @@ int main(int ac, char *av[])
 	/////printf("x = %d, y = %d\n", position[1], position[0]);
 
 	//refresh(&tool);
+	tool.img_ptrnew2 = mlx_new_image(tool.mlx_ptr, 1920, 1080);
+	tool.addr2 = mlx_get_data_addr(tool.img_ptrnew2, &tool.bits_per_pixel2, &tool.line_length2, &tool.endian2);
 	create_img_addr(&tool);
 	create_background(&tool, tool.c_color);
 	init_player_pos(&tool);
 	create_grid(&tool);
-	tool.img_ptrnew2 = mlx_new_image(tool.mlx_ptr, 1920, 1080);
-	tool.img_ptrnew2 = tool.img_ptrnew;
+	printf("je suis la\n");
+	memcpy(tool.addr2, tool.addr, tool.bits_per_pixel);
 	display_player(&tool);
 	mlx_put_image_to_window(tool.mlx_ptr, tool.win_ptr, tool.img_ptrnew, 0, 0);
 	mlx_hook(tool.win_ptr, 2, 1L<<0, press, &tool);
