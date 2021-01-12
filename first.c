@@ -277,7 +277,7 @@ void move_backward(tools *tool)
 
 void move_left(tools *tool)
 {
-	tool->posy += (cos(tool->dir) * tool->speed);
+	tool->posy -= (cos(tool->dir) * tool->speed);
 	tool->posx -= (sin(tool->dir) * tool->speed);
 	tool->pos_player[0] = (int)tool->posx;
 	tool->pos_player[1] = (int)tool->posy;
@@ -285,7 +285,7 @@ void move_left(tools *tool)
 
 void move_right(tools *tool)
 {
-	tool->posy -= (cos(tool->dir) * tool->speed);
+	tool->posy += (cos(tool->dir) * tool->speed);
 	tool->posx += (sin(tool->dir) * tool->speed);
 	tool->pos_player[0] = (int)tool->posx;
 	tool->pos_player[1] = (int)tool->posy;
@@ -362,6 +362,71 @@ int hit_west(tools *tool)
 	return (0);
 }
 
+int hit_up(tools *tool)
+{
+	int i;
+
+	i = 0;
+	if (sin(tool->dir) > 0)
+		i = hit_north(tool);
+	else if (sin(tool->dir) < 0)
+		i = hit_south(tool);
+	if (cos(tool->dir) > 0)
+		i = i | hit_east(tool);
+	else if (cos(tool->dir) < 0)
+		i = i | hit_west(tool);
+	return (i);
+}
+
+int hit_down(tools *tool)
+{
+	int i;
+
+	i = 0;
+	printf("%f", sin(tool->dir));
+	if (sin(tool->dir) < 0)
+		i = hit_north(tool);
+	else if (sin(tool->dir) > 0)
+		i = hit_south(tool);
+	if (cos(tool->dir) < 0)
+		i = i | hit_east(tool);
+	else if (cos(tool->dir) > 0)
+		i = i | hit_west(tool);
+	return (i);
+}
+
+int hit_left(tools *tool)
+{
+	int i;
+
+	i = 0;
+	if (sin(tool->dir) > 0)
+		i = hit_north(tool);
+	else if (sin(tool->dir) < 0)
+		i = hit_south(tool);
+	if (cos(tool->dir) > 0)
+		i = i | hit_east(tool);
+	else if (cos(tool->dir) < 0)
+		i = i | hit_west(tool);
+	return (i);
+}
+
+int hit_right(tools *tool)
+{
+	int i;
+
+	i = 0;
+	if (sin(tool->dir) > 0)
+		i = hit_north(tool);
+	else if (sin(tool->dir) < 0)
+		i = hit_south(tool);
+	if (cos(tool->dir) > 0)
+		i = i | hit_east(tool);
+	else if (cos(tool->dir) < 0)
+		i = i | hit_west(tool);
+	return (i);
+}
+
 void	refresh(tools *tool) //old
 {
 	//mlx_clear_window(tool->mlx_ptr, tool->win_ptr);
@@ -371,7 +436,7 @@ void	refresh(tools *tool) //old
 
 void move_player(tools *tool)
 {
-	if (tool->keyup && !hit_north(tool))
+	if (tool->keyup && !hit_up(tool))
 	{
 		move_forward(tool);
 	}
@@ -379,7 +444,7 @@ void move_player(tools *tool)
 	{
 		move_left(tool);
 	}
-	if (tool->keydown && !hit_south(tool))
+	if (tool->keydown && !hit_down(tool))
 	{
 		move_backward(tool);
 	}
@@ -387,8 +452,17 @@ void move_player(tools *tool)
 	{
 		move_right(tool);
 	}
-	if (tool->keyup || tool->keydown || tool->keyleft || tool->keyright)
+	if (tool->rotate_left)
 	{
+		rotate_left(tool);
+	}
+	if (tool->rotate_right)
+	{
+		rotate_right(tool);
+	}
+	if (tool->keyup || tool->keydown || tool->keyleft || tool->keyright || tool->rotate_left || tool->rotate_right)
+	{
+		printf("dir = %f\n", tool->dir);
 		create_grid(tool);
 		display_player(tool);
 		mlx_put_image_to_window(tool->mlx_ptr, tool->win_ptr, tool->img_ptrnew, 0, 0);
@@ -407,6 +481,10 @@ int 	press(int keycode, tools *tool) //old
 		tool->keydown = 1;
 	if (keycode == 2) //2 100
 		tool->keyright = 1;
+	if (keycode == 123)
+		tool->rotate_left = 1;
+	if (keycode == 124)
+		tool->rotate_right = 1;
 	move_player(tool);
 	printf("je suis dans press et le keycode est %d\n", keycode);
 	return 1;
@@ -422,6 +500,10 @@ int		release(int keycode, tools *tool) //old
 		tool->keydown = 0;
 	if (keycode == 2) //2 100
 		tool->keyright = 0;
+	if (keycode == 123)
+		tool->rotate_left = 0;
+	if (keycode == 124)
+		tool->rotate_right = 0;
 	printf("keyrelease\n");
 	return 1;
 }

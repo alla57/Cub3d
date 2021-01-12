@@ -54,6 +54,8 @@ typedef struct
 	int endian;
 	int max_y;
 	int case_len;
+	int rotate_left;
+	int rotate_right;
 }tools;
 
 void	struct_init(tools *tool);
