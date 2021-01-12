@@ -9,7 +9,6 @@
 #include <math.h>
 //#include "../minilibx-linux/mlx.h"
 #include "../minilibx_opengl_20191021/mlx.h"
-#include "../minilibx-mac-osx/mlx.h"
 //#include "get_next_line.h"
 #include "../Libft/libft.h"
 
@@ -21,7 +20,6 @@ typedef struct
 	void	*win_ptr;
 	void	*img_ptr;
 	void	*img_ptrnew;//////////// a supprimer plus tard
-	void	*img_ptrnew2; //// a supprimer
 	char	*no_path;
 	char	*so_path;
 	char	*ea_path;
@@ -51,13 +49,9 @@ typedef struct
 	int pos_x; //a supprimer
 	int pos_y; //a supprimer
 	char *addr;
-	char *addr2; //a supprimer
 	int bits_per_pixel;
-	int bits_per_pixel2; //a supprimer
 	int line_length;
-	int line_length2; //a supprimer
 	int endian;
-	int endian2; //a supprimer
 	int max_y;
 	int case_len;
 }tools;

@@ -1,5 +1,4 @@
 //#include "./minilibx-linux/mlx.h"
-//#include "minilibx-mac-osx/mlx.h"
 #include "minilibx_opengl_20191021/mlx.h"
 #include <stdio.h>
 #include <unistd.h>
@@ -390,8 +389,7 @@ void move_player(tools *tool)
 	}
 	if (tool->keyup || tool->keydown || tool->keyleft || tool->keyright)
 	{
-		//tool->img_ptrnew = tool->img_ptrnew2;
-		memcpy(tool->img_ptrnew, tool->img_ptrnew2, tool->bits_per_pixel);
+		create_grid(tool);
 		display_player(tool);
 		mlx_put_image_to_window(tool->mlx_ptr, tool->win_ptr, tool->img_ptrnew, 0, 0);
 		printf("x = %f y = %f\n", tool->posx, tool->posy);
@@ -449,14 +447,10 @@ int main(int ac, char *av[])
 	/////printf("x = %d, y = %d\n", position[1], position[0]);
 
 	//refresh(&tool);
-	tool.img_ptrnew2 = mlx_new_image(tool.mlx_ptr, 1920, 1080);
-	tool.addr2 = mlx_get_data_addr(tool.img_ptrnew2, &tool.bits_per_pixel2, &tool.line_length2, &tool.endian2);
 	create_img_addr(&tool);
 	create_background(&tool, tool.c_color);
 	init_player_pos(&tool);
 	create_grid(&tool);
-	printf("je suis la\n");
-	memcpy(tool.addr2, tool.addr, tool.bits_per_pixel);
 	display_player(&tool);
 	mlx_put_image_to_window(tool.mlx_ptr, tool.win_ptr, tool.img_ptrnew, 0, 0);
 	mlx_hook(tool.win_ptr, 2, 1L<<0, press, &tool);
