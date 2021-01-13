@@ -400,13 +400,13 @@ int hit_left(tools *tool)
 	int i;
 
 	i = 0;
-	if (sin(tool->dir) > 0)
-		i = hit_north(tool);
-	else if (sin(tool->dir) < 0)
-		i = hit_south(tool);
 	if (cos(tool->dir) > 0)
-		i = i | hit_east(tool);
+		i = hit_north(tool);
 	else if (cos(tool->dir) < 0)
+		i = hit_south(tool);
+	if (sin(tool->dir) < 0)
+		i = i | hit_east(tool);
+	else if (sin(tool->dir) > 0)
 		i = i | hit_west(tool);
 	return (i);
 }
@@ -416,13 +416,13 @@ int hit_right(tools *tool)
 	int i;
 
 	i = 0;
-	if (sin(tool->dir) > 0)
+	if (cos(tool->dir) < 0)
 		i = hit_north(tool);
-	else if (sin(tool->dir) < 0)
+	else if (cos(tool->dir) > 0)
 		i = hit_south(tool);
-	if (cos(tool->dir) > 0)
+	if (sin(tool->dir) > 0)
 		i = i | hit_east(tool);
-	else if (cos(tool->dir) < 0)
+	else if (sin(tool->dir) < 0)
 		i = i | hit_west(tool);
 	return (i);
 }
@@ -440,7 +440,7 @@ void move_player(tools *tool)
 	{
 		move_forward(tool);
 	}
-	if (tool->keyleft && !hit_west(tool))
+	if (tool->keyleft && !hit_left(tool))
 	{
 		move_left(tool);
 	}
@@ -448,7 +448,7 @@ void move_player(tools *tool)
 	{
 		move_backward(tool);
 	}
-	if (tool->keyright && !hit_east(tool))
+	if (tool->keyright && !hit_right(tool))
 	{
 		move_right(tool);
 	}
