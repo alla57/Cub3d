@@ -210,6 +210,25 @@ void display_player(tools *tool)
 	}
 }
 
+void display_dir(tools *tool)
+{
+	double x;
+	double y;
+	int len;
+	int color;
+
+	len = 5;
+	color = 0x00000000;
+	x = tool->posx * (double)tool->case_len;
+	y = tool->posy * (double)tool->case_len;
+	while (len-- > 0)
+	{
+		my_mlx_pixel_put(tool, x, y, color);
+		x = x + (cos(tool->dir) * len);
+		y = y - (sin(tool->dir) * len);
+	}
+}
+
 void create_grid(tools* tool)
 {
 	int max_x;
@@ -465,6 +484,7 @@ void move_player(tools *tool)
 		printf("dir = %f\n", tool->dir);
 		create_grid(tool);
 		display_player(tool);
+		display_dir(tool);
 		mlx_put_image_to_window(tool->mlx_ptr, tool->win_ptr, tool->img_ptrnew, 0, 0);
 		printf("x = %f y = %f\n", tool->posx, tool->posy);
 		//refresh(tool);
