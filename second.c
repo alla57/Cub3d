@@ -60,7 +60,7 @@ void create_img_addr(tools *tool)
 	tool->addr = mlx_get_data_addr(tool->img_ptrnew, &tool->bits_per_pixel, &tool->line_length, &tool->endian);
 }
 
-void create_background(tools *tool, int color)
+void draw_background(tools *tool, int color)
 {
 	tool->pos_x = 0;
 	while (tool->pos_x < 1920)
@@ -316,7 +316,7 @@ int resize(tools *tool) //old
 
 void move_forward(tools *tool)
 {
-	printf("tool->posy = %f sin(tool->dir) = %f tool->speed = %f\n", tool->posy, sin(tool->dir), tool->speed);
+	//printf("tool->posy = %f sin(tool->dir) = %f tool->speed = %f\n", tool->posy, sin(tool->dir), tool->speed);
 	tool->posy -= (sin(tool->dir) * tool->speed);
 	tool->posx += (cos(tool->dir) * tool->speed);
 	tool->pos_player[0] = (int)tool->posx;
@@ -583,12 +583,8 @@ int main(int ac, char *av[])
 	else
 		printf("error\n");
 
-	/////get_position(worldMap, mapWidth, position);
-	/////printf("x = %d, y = %d\n", position[1], position[0]);
-
-	//refresh(&tool);
 	create_img_addr(&tool);
-	create_background(&tool, tool.c_color);
+	draw_background(&tool, tool.c_color);
 	init_player_pos(&tool);
 	create_grid(&tool);
 	display_player(&tool);
