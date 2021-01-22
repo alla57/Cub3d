@@ -19,6 +19,8 @@ void struct_ini(tools *tool)
 	tool->keyleft = 0;
 	tool->keydown = 0;
 	tool->keyright = 0;
+	tool->rotate_right = 0;
+	tool->rotate_left = 0;
 	tool->mlx_ptr = mlx_init();
 	tool->win_ptr = mlx_new_window(tool->mlx_ptr, tool->res_x, tool->res_y, tool->title);
 	tool->img_ptr = mlx_xpm_file_to_image(tool->mlx_ptr, "eagle.xpm", &tool->width, &tool->height);
@@ -26,25 +28,6 @@ void struct_ini(tools *tool)
 	tool->pos_player[0] = 11;
 	tool->pos_player[1] = 9;
 }
-/*
-int apply(tools *tool) //old
-{
-	if (tool->speed == 2)
-		tool->speed = 0;
-	if (tool->keyup && tool->pos_y > 0 && tool->speed == 1)
-		--tool->pos_y;
-	if (tool->keyleft && tool->pos_x > 0 && tool->speed == 1)
-		--tool->pos_x;
-	if (tool->keydown && tool->pos_y < 986 && tool->speed == 1)
-		++tool->pos_y;
-	if (tool->keyright && tool->pos_x < 1856 && tool->speed == 1)
-		++tool->pos_x;
-	if (tool->keyup || tool->keydown || tool->keyleft || tool->keyright)
-		refresh(tool);
-	++tool->speed;
-	return 1;
-}
-*/
 
 void my_mlx_pixel_put(tools *tool, int x, int y, int color)
 {
@@ -156,14 +139,12 @@ void coloring_cases(tools *tool, int case_len, int max_x)
 		i = 0;
 		while (i < max_x)
 		{
-			//printf("i = %d j = %d |%c|\n", i, j, tool->map[j][i]);
 			if (tool->map[j][i] == ' ')
 			{
 				coloring_spaces(tool, x, y, case_len);
 			}
 			else if(tool->map[j][i] == '1')
 			{
-				//printf("x = %d y = %d\n", x, y);
 				coloring_one(tool, x, y, case_len);
 			}
 			else if(tool->map[j][i] == '0')
@@ -209,59 +190,101 @@ void display_player(tools *tool)
 		++y;
 	}
 }
-/*
-void ray_hit(tools *tool)
+
+void draw_column(double height, int column, int len_column, tools *tool)
 {
-	double x;
-	double y;
+	int x;
+	int y;
 	int i;
+	int color;
 
-	x = tool->posx * (double)tool->case_len;
-	y = tool->posy * (double)tool->case_len;
-	if (y == abs(y) && ((sin(tool->dir) > 0 && map[y - 1][x] == '1') || (sin(tool->dir) < 0 && map[y][x] == '1')))
-		return ;
-	if (y == abs(x) && ((cos(tool->dir) > 0 && map[y][x] == '1') || (cos(tool->dir) < 0 && map[y][x - 1] == '1')))
-		return ;
-}*/
+	i = -1;
+	color = 0x00C70039;
+	x = column;
+	//printf("column = %d\n" , column);
+	while (x < column + len_column && x <= tool->res_x)
+	{
+		y = 0;
+		while (++i < (tool->res_y - height) / 2)
+		{
+			my_mlx_pixel_put(tool, x, y++, 0x00000000);
+		}
+		i = -1;
+		while (++i < height && i < 1080)
+		{
+			my_mlx_pixel_put(tool, x, y++, color);
+		}
+		i = -1;
+		while (y < tool->res_y)//tool->res_y - heigh) / 2)
+		{
+			my_mlx_pixel_put(tool, x, y++, 0x00000000);
+		}
+		++x;
+	}
+}
 
-void display_dir(tools *tool)
+int calculate_height(double vec_x, double vec_y, tools *tool)
+{
+	double dist;
+	double height;
+
+	//printf("x = %f y = %f x + y = %f\n", vec_x, vec_y, vec_x + vec_y);
+	dist = sqrt(vec_x * vec_x + vec_y * vec_y);
+	//printf("dist = %f raydir = %f ", dist, tool->ray_dir);
+	dist = dist * cos(fabs(tool->ray_dir));
+	height = (tool->res_y * tool->case_len)/ dist;
+	//printf("height = %f\n", height);
+	return (height);
+}
+
+void calculate_dist(int column, int len_column, tools *tool)
 {
 	double x;
 	double y;
-	int color;
 	int i;
 	int j;
 
-	color = 0x00FFFF00;
 	x = tool->posx * (double)tool->case_len;
 	y = tool->posy * (double)tool->case_len;
 	while (1)
 	{
-		my_mlx_pixel_put(tool, x, y, color);
 		x = x + cos(tool->dir);
 		y = y - sin(tool->dir);
 		i = x / tool->case_len;
 		j = y / tool->case_len;
-		if (y<1)
-			return ;
-		//printf("y = %f dir = %f\n", y, sin(tool->dir));
-		if (y == fabs(y) && ((sin(tool->dir) > 0 && tool->map[j][i] == '1') || (sin(tool->dir) < 0 && tool->map[j][i] == '1')))
-			return ;
-		if (x == fabs(x) && ((cos(tool->dir) > 0 && tool->map[j][i] == '1') || (cos(tool->dir) < 0 && tool->map[j][i] == '1')))
-			return ;
+		if ((sin(tool->dir) > 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' ')) || (sin(tool->dir) < 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' ')))
+		{
+			printf("y = %f i = %d res = %d\n", y, j, tool->case_len);
+			if ((int)x - 30== i * tool->case_len)
+				x = (int)x;
+			if ((int)y - 30== j * tool->case_len)
+				y = (int)y;
+			break ;
+		}
 	}
+	//printf("i = %d j= %d\n", i, j);
+	x = x - (tool->posx * (double)tool->case_len);
+	y = y - (tool->posy * (double)tool->case_len);
+	draw_column(calculate_height(x, y, tool), column, len_column, tool);
 }
 
-void display_angle(tools *tool)
+void raycasting(tools *tool) //display_angle
 {
 	double olddir;
+	int column;
+	int len_column;
 
 	olddir = tool->dir;
-	tool->dir = olddir - 0.6;
-	while (tool->dir < olddir + 0.6)
+	tool->dir = olddir + 0.6;
+	column = 0;
+	len_column = tool->res_x / (1.2/0.005);
+	tool->ray_dir = 0.6;
+	while (tool->dir > olddir - 0.6)
 	{
-		display_dir(tool);
-		tool->dir += tool->speed;
+		calculate_dist(column, len_column, tool);
+		tool->dir -= 0.005;
+		tool->ray_dir -= 0.005;
+		column += len_column;
 	}
 	tool->dir = olddir;
 }
@@ -305,14 +328,6 @@ void create_grid(tools* tool)
 		++j;
 	}
 }
-/*
-int resize(tools *tool) //old
-{
-	mlx_get_screen_size(tool->mlx_ptr, &tool->res_x, &tool->res_y);
-	tool->win_ptr = mlx_new_window(tool->mlx_ptr, tool->res_x, tool->res_y, tool->title);
-	return (1);
-}
-*/
 
 void move_forward(tools *tool)
 {
@@ -439,7 +454,6 @@ int hit_down(tools *tool)
 	int i;
 
 	i = 0;
-	printf("%f", sin(tool->dir));
 	if (sin(tool->dir) < 0)
 		i = hit_north(tool);
 	else if (sin(tool->dir) > 0)
@@ -518,13 +532,13 @@ void move_player(tools *tool)
 	}
 	if (tool->keyup || tool->keydown || tool->keyleft || tool->keyright || tool->rotate_left || tool->rotate_right)
 	{
-		printf("dir = %f\n", tool->dir);
-		create_grid(tool);
-		display_player(tool);
+		//create_grid(tool);
+		//display_player(tool);
 		//display_dir(tool);
-		display_angle(tool);
+		//display_angle(tool);
+		raycasting(tool);
 		mlx_put_image_to_window(tool->mlx_ptr, tool->win_ptr, tool->img_ptrnew, 0, 0);
-		printf("x = %f y = %f\n", tool->posx, tool->posy);
+		//printf("x = %f y = %f\n", tool->posx, tool->posy);
 		//refresh(tool);
 	}
 }
@@ -544,7 +558,7 @@ int 	press(int keycode, tools *tool) //old
 	if (keycode == 124)
 		tool->rotate_right = 1;
 	move_player(tool);
-	printf("je suis dans press et le keycode est %d\n", keycode);
+	//printf("je suis dans press et le keycode est %d\n", keycode);
 	return 1;
 }
 

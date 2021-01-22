@@ -245,10 +245,10 @@ void display_dir(tools *tool)
 		if (y<1)
 			return ;
 		//printf("y = %f dir = %f\n", y, sin(tool->dir));
-		if (y == fabs(y) && ((sin(tool->dir) > 0 && tool->map[j][i] == '1') || (sin(tool->dir) < 0 && tool->map[j][i] == '1')))
+		if (y == fabs(y) && ((sin(tool->dir) > 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' ')) || (sin(tool->dir) < 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' '))))
 			return ;
-		if (x == fabs(x) && ((cos(tool->dir) > 0 && tool->map[j][i] == '1') || (cos(tool->dir) < 0 && tool->map[j][i] == '1')))
-			return ;
+		//if (x == fabs(x) && ((cos(tool->dir) > 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' ')) || (cos(tool->dir) < 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' '))))
+		//	return ;
 	}
 }
 
@@ -261,7 +261,7 @@ void display_angle(tools *tool)
 	while (tool->dir < olddir + 0.6)
 	{
 		display_dir(tool);
-		tool->dir += tool->speed;
+		tool->dir += 0.01;
 	}
 	tool->dir = olddir;
 }

@@ -56,6 +56,7 @@ typedef struct
 	int case_len;
 	int rotate_left;
 	int rotate_right;
+	double ray_dir;
 }tools;
 
 void	struct_init(tools *tool);
