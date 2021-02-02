@@ -16,3 +16,5 @@ a faire : 	regle makefile qui appelle le makefile de la libft		//done
 			
 			Il faudra faire un malloc puis un memcpy de img_ptrnew dans img_ptrnew2 pour refresh l'image.
 			66deg = 1.15192 rad
+			https://stackoverflow.com/questions/46607152/dda-algorithm-raycasting
+			https://www.gamedev.net/forums/topic/679999-optimize-field-of-vision-algorithm-in-a-grid-tiled-map/

@@ -5,28 +5,23 @@
 #include "include/cub3d.h"
 #include "Libft/libft.h"
 
-void struct_ini(tools *tool)
+void init_param(tools *tool)
 {
-	tool->res_x = 1920;
-	tool->res_y = 1080;
-	tool->pos_x = 218;
-	tool->pos_y = 218;
-	tool->f_color = 65280;
-	tool->width = 64;
-	tool->height = 64;
-	tool->title = "je suis la";
 	tool->keyup = 0;
 	tool->keyleft = 0;
 	tool->keydown = 0;
 	tool->keyright = 0;
 	tool->rotate_right = 0;
 	tool->rotate_left = 0;
+	tool->speed = 0.1;
+	//tool->img_ptr = mlx_xpm_file_to_image(tool->mlx_ptr, "eagle.xpm", &tool->width, &tool->height);
+}
+
+void init_window(tools *tool)
+{
+	tool->title = "Cub3d";
 	tool->mlx_ptr = mlx_init();
 	tool->win_ptr = mlx_new_window(tool->mlx_ptr, tool->res_x, tool->res_y, tool->title);
-	tool->img_ptr = mlx_xpm_file_to_image(tool->mlx_ptr, "eagle.xpm", &tool->width, &tool->height);
-	tool->speed = 0.1;
-	tool->pos_player[0] = 11;
-	tool->pos_player[1] = 9;
 }
 
 void my_mlx_pixel_put(tools *tool, int x, int y, int color)
@@ -39,156 +34,14 @@ void my_mlx_pixel_put(tools *tool, int x, int y, int color)
 
 void create_img_addr(tools *tool)
 {
-	tool->img_ptrnew = mlx_new_image(tool->mlx_ptr, 1920, 1080);
+	tool->img_ptrnew = mlx_new_image(tool->mlx_ptr, tool->res_x, tool->res_y);
 	tool->addr = mlx_get_data_addr(tool->img_ptrnew, &tool->bits_per_pixel, &tool->line_length, &tool->endian);
-}
-
-void draw_background(tools *tool, int color)
-{
-	tool->pos_x = 0;
-	while (tool->pos_x < 1920)
-	{
-		tool->pos_y = 0;
-		while (tool->pos_y < 1080)
-		{
-			my_mlx_pixel_put(tool, tool->pos_x, tool->pos_y, color);
-			++tool->pos_y;
-		}
-		++tool->pos_x;
-	}
-}
-
-void coloring_spaces(tools *tool, int x, int y, int case_len)
-{
-	int color;
-	int i;
-	int j;
-	int x_temp;
-
-	j = 0;
-	x_temp = x;
-	color = 0x000000FF; //BLUE
-	while (j++ < case_len)
-	{
-		i = 0;
-		x = x_temp;
-		while (i++ < case_len && y <= tool->res_y && x <= tool->res_x)
-		{
-			my_mlx_pixel_put(tool, x++, y, color);
-		}
-		++y;
-	}
-}
-
-void coloring_one(tools *tool, int x, int y, int case_len)
-{
-	int color;
-	int i;
-	int j;
-	int x_temp;
-
-	j = 0;
-	x_temp = x;
-	color = 0x00FF0000; //RED
-	while (j++ < case_len)
-	{
-		i = 0;
-		x = x_temp;
-		while (i++ < case_len && y <= tool->res_y && x <= tool->res_x)
-		{
-			my_mlx_pixel_put(tool, x++, y, color);
-		}
-		++y;
-	}
-}
-
-void coloring_zero(tools *tool, int x, int y, int case_len)
-{
-	int color;
-	int i;
-	int j;
-	int x_temp;
-
-	j = 0;
-	x_temp = x;
-	color = 0x0000FA00; //GREEN
-	while (j++ < case_len)
-	{
-		i = 0;
-		x = x_temp;
-		while (i++ < case_len && y <= tool->res_y && x <= tool->res_x)
-		{
-			my_mlx_pixel_put(tool, x++, y, color);
-		}
-		++y;
-	}
-}
-
-void coloring_cases(tools *tool, int case_len, int max_x)
-{
-	int x;
-	int y;
-	int i;
-	int j;
-
-	y = 0;
-	j = 0;
-	while (j < tool->max_y)
-	{
-		x = 0;
-		i = 0;
-		while (i < max_x)
-		{
-			if (tool->map[j][i] == ' ')
-			{
-				coloring_spaces(tool, x, y, case_len);
-			}
-			else if(tool->map[j][i] == '1')
-			{
-				coloring_one(tool, x, y, case_len);
-			}
-			else if(tool->map[j][i] == '0')
-			{
-				coloring_zero(tool, x, y, case_len);
-			}
-			x += case_len;
-			i++;
-		}
-		y += case_len;
-		j++;
-	}
 }
 
 void init_player_pos(tools *tool)
 {
 	tool->posy = tool->pos_player[0] + 0.5;
 	tool->posx = tool->pos_player[1] + 0.5;
-}
-
-void display_player(tools *tool)
-{
-	double x;
-	double y;
-	int i;
-	int j;
-	int color;
-	int pos_len;
-
-	color = 0x00F5F500;
-	pos_len = tool->case_len / 2;
-	x = tool->posx * (double)tool->case_len;
-	y = tool->posy * (double)tool->case_len;
-	x = x - (0.25 * tool->case_len);
-	y = y - (0.25 * tool->case_len);
-	i = x + (0.5 * tool->case_len);
-	j = y + (0.5 * tool->case_len);
-	while (y < j)
-	{
-		while (x < i)
-			my_mlx_pixel_put(tool, x++, y, color);
-		x = x - (0.5 * tool->case_len);
-		++y;
-	}
 }
 
 void draw_column(double height, int column, int len_column, tools *tool)
@@ -199,9 +52,23 @@ void draw_column(double height, int column, int len_column, tools *tool)
 	int color;
 
 	i = -1;
-	color = 0x00C70039;
 	x = column;
 	//printf("column = %d\n" , column);
+	if (sin(tool->dir) > 0)
+	{
+		if (cos(tool->dir) > 0)
+			color = 0x00C70039;
+		else
+			color = 0x0058D68D;
+	}
+	else
+	{
+		if (cos(tool->dir) > 0)
+			color = 0x007D3C98;
+		else
+			color = 0x007D3C98;
+	}
+	
 	while (x < column + len_column && x <= tool->res_x)
 	{
 		y = 0;
@@ -210,7 +77,7 @@ void draw_column(double height, int column, int len_column, tools *tool)
 			my_mlx_pixel_put(tool, x, y++, 0x00000000);
 		}
 		i = -1;
-		while (++i < height && i < 1080)
+		while (++i < height && i < tool->res_y)
 		{
 			my_mlx_pixel_put(tool, x, y++, color);
 		}
@@ -221,6 +88,10 @@ void draw_column(double height, int column, int len_column, tools *tool)
 		}
 		++x;
 	}
+	y = -1;
+	--x;
+	while (++y < tool->res_y)
+		my_mlx_pixel_put(tool, x, y, 0x00000000);
 }
 
 int calculate_height(double vec_x, double vec_y, tools *tool)
@@ -230,9 +101,9 @@ int calculate_height(double vec_x, double vec_y, tools *tool)
 
 	//printf("x = %f y = %f x + y = %f\n", vec_x, vec_y, vec_x + vec_y);
 	dist = sqrt(vec_x * vec_x + vec_y * vec_y);
-	//printf("dist = %f raydir = %f ", dist, tool->ray_dir);
+	printf("dist = %f raydir = %f ", dist, tool->ray_dir);
 	dist = dist * cos(fabs(tool->ray_dir));
-	height = (tool->res_y * tool->case_len)/ dist;
+	height = (tool->res_y * 31)/ dist;
 	//printf("height = %f\n", height);
 	return (height);
 }
@@ -243,28 +114,28 @@ void calculate_dist(int column, int len_column, tools *tool)
 	double y;
 	int i;
 	int j;
-
-	x = tool->posx * (double)tool->case_len;
-	y = tool->posy * (double)tool->case_len;
+//debut du ctrl z
+	x = tool->posx * 31;
+	y = tool->posy * 31;
 	while (1)
 	{
 		x = x + cos(tool->dir);
 		y = y - sin(tool->dir);
-		i = x / tool->case_len;
-		j = y / tool->case_len;
+		i = x / 31;
+		j = y / 31;
 		if ((sin(tool->dir) > 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' ')) || (sin(tool->dir) < 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' ')))
 		{
-			printf("y = %f i = %d res = %d\n", y, j, tool->case_len);
-			if ((int)x - 30== i * tool->case_len)
+			printf("y = %f i = %d res = %d\n", y, j, 31);
+			if ((int)x - 30== i * 31)
 				x = (int)x;
-			if ((int)y - 30== j * tool->case_len)
+			if ((int)y - 30== j * 31)
 				y = (int)y;
 			break ;
 		}
 	}
 	//printf("i = %d j= %d\n", i, j);
-	x = x - (tool->posx * (double)tool->case_len);
-	y = y - (tool->posy * (double)tool->case_len);
+	x = x - (tool->posx * 31);
+	y = y - (tool->posy * 31);
 	draw_column(calculate_height(x, y, tool), column, len_column, tool);
 }
 
@@ -287,46 +158,6 @@ void raycasting(tools *tool) //display_angle
 		column += len_column;
 	}
 	tool->dir = olddir;
-}
-
-void create_grid(tools* tool)
-{
-	int max_x;
-	int case_len;
-	int x;
-	int y;
-	int i;
-	int j;
-	int thickness;
-
-	max_x = ft_strlen(tool->map[0]) - 1;
-	case_len = tool->res_x / max_x < tool->res_y / tool->max_y ? tool->res_x / max_x : tool->res_y / tool->max_y;
-	tool->case_len = case_len;
-	coloring_cases(tool, case_len, max_x);
-	//display_player(tool);
-	y = 0;
-	j = 0;
-	while (y < tool->res_y)
-	{
-		x = 0;
-		if (j == case_len)
-		{
-			while (x <= tool->res_x)
-				my_mlx_pixel_put(tool, x++, y, 0x00000000);
-			j = 0;
-		}
-		while (x < tool->res_x)
-		{
-			thickness = 2;
-			while (thickness-- > 0 )
-				my_mlx_pixel_put(tool, x++, y, 0x00000000);
-			i = 0;
-			while (i++ < (case_len - 2))
-				++x;
-		}
-		++y;
-		++j;
-	}
 }
 
 void move_forward(tools *tool)
@@ -497,13 +328,6 @@ int hit_right(tools *tool)
 	return (i);
 }
 
-void	refresh(tools *tool) //old
-{
-	//mlx_clear_window(tool->mlx_ptr, tool->win_ptr);
-	mlx_put_image_to_window(tool->mlx_ptr, tool->win_ptr, tool->img_ptrnew, (tool->pos_x - 64), (tool->pos_y - 64));
-	mlx_put_image_to_window(tool->mlx_ptr, tool->win_ptr, tool->img_ptr, tool->pos_x, tool->pos_y);
-}
-
 void move_player(tools *tool)
 {
 	if (tool->keyup && !hit_up(tool))
@@ -532,14 +356,9 @@ void move_player(tools *tool)
 	}
 	if (tool->keyup || tool->keydown || tool->keyleft || tool->keyright || tool->rotate_left || tool->rotate_right)
 	{
-		//create_grid(tool);
-		//display_player(tool);
-		//display_dir(tool);
-		//display_angle(tool);
 		raycasting(tool);
 		mlx_put_image_to_window(tool->mlx_ptr, tool->win_ptr, tool->img_ptrnew, 0, 0);
 		//printf("x = %f y = %f\n", tool->posx, tool->posy);
-		//refresh(tool);
 	}
 }
 
@@ -589,7 +408,6 @@ int main(int ac, char *av[])
 	tools tool;
 
 	(void)(ac);
-	struct_ini(&tool);
 	if (get_map_param(av[1], &tool))
 	{
 		printf("tous les parametres sont bons\n");
@@ -597,11 +415,10 @@ int main(int ac, char *av[])
 	else
 		printf("error\n");
 
+	init_param(&tool);
+	init_window(&tool);
 	create_img_addr(&tool);
-	draw_background(&tool, tool.c_color);
 	init_player_pos(&tool);
-	create_grid(&tool);
-	display_player(&tool);
 	mlx_put_image_to_window(tool.mlx_ptr, tool.win_ptr, tool.img_ptrnew, 0, 0);
 	mlx_hook(tool.win_ptr, 2, 1L<<0, press, &tool);
 	mlx_hook(tool.win_ptr, 3, 1L<<1, release, &tool);
