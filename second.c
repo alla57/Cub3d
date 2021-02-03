@@ -108,6 +108,72 @@ int calculate_height(double vec_x, double vec_y, tools *tool)
 	return (height);
 }
 
+int hit_column(tools *tool, int column)
+{
+	double t;
+	double y;
+	int i;
+	int j;
+
+	t = (column - tool->pos_x) / cos(tool->dir); //pour la colonne
+	y = tool->pos_y - sin(tool->dir) * t;
+	i = column;
+	j = (int)y;
+	if ((sin(tool->dir) > 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' ')) || (sin(tool->dir) < 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' ')))
+		return (1);
+	return (0);
+}
+
+int hit_row(tools *tool, int row)
+{
+	double t;
+	double x;
+	int i;
+	int j;
+
+	t = (row - tool->pos_y) / (-1 * sin(tool->dir)); // pour la row
+	x = tool->pos_x + cos(tool->dir) * t;
+	i = (int)x;
+	j = row;
+	if ((sin(tool->dir) > 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' ')) || (sin(tool->dir) < 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' ')))
+		return (1);
+	return (0);
+}
+
+void new_calcul(tools *tool)
+{
+	int column;
+	int row;
+	int hit;
+
+	hit = 0;
+	column = (int)tool->pos_x;
+	row = (int)tool->pos_y;
+	while (1)
+	{
+		if (hit_column(tool, column))
+			hit = 1;
+		if (cos(tool->dir) > 0)
+		{
+			column++;
+		}
+		else
+		{
+			column--;
+		}
+		if (hit_row(tool, row))
+			hit = 2;
+		if (sin(tool->dir) > 0)
+		{
+			row--;
+		}
+		else
+		{
+			row++;
+		}
+	}
+}
+
 void calculate_dist(int column, int len_column, tools *tool)
 {
 	double x;
