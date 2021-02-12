@@ -49,9 +49,13 @@ typedef struct
 	int pos_x; //a supprimer
 	int pos_y; //a supprimer
 	char *addr;
+	char *addr_2;
 	int bits_per_pixel;
 	int line_length;
 	int endian;
+	int bits_per_pixel_2;
+	int line_length_2;
+	int endian_2;
 	int max_y;
 	int case_len;
 	int rotate_left;

@@ -19,6 +19,8 @@ void struct_ini(tools *tool)
 	tool->keyleft = 0;
 	tool->keydown = 0;
 	tool->keyright = 0;
+	tool->rotate_left = 0;
+	tool->rotate_right = 0;
 	tool->mlx_ptr = mlx_init();
 	tool->win_ptr = mlx_new_window(tool->mlx_ptr, tool->res_x, tool->res_y, tool->title);
 	tool->img_ptr = mlx_xpm_file_to_image(tool->mlx_ptr, "eagle.xpm", &tool->width, &tool->height);
@@ -224,6 +226,98 @@ void ray_hit(tools *tool)
 		return ;
 }*/
 
+double ft_round(double n)
+{
+	n = round(n * 1000);
+	n = n/ 1000;
+	return (n);
+}
+
+double dist(tools *tool, double x, double y)
+{
+	x -= tool->posx;
+	y -= tool->posy;
+	x = x * x;
+	y = y * y;
+	return (sqrt(x + y));
+}
+
+double hit_column(tools *tool, int column)
+{
+	double t;
+	double y;
+	int i;
+	int j;
+
+	i = -5;
+	printf("\ncolumn = %d\n", column);
+	cos(tool->dir) > 0 ? column : column++;
+	while (i == -5 || !((cos(tool->dir) < 0 && (tool->map[j][i - 1] == '1' || tool->map[j][i - 1] == ' ')) || (cos(tool->dir) > 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' '))))
+	{
+		cos(tool->dir) > 0 ? column++ : column--;
+		t = (column - tool->posx) / cos(tool->dir); //pour la colonne
+		y = tool->posy - sin(tool->dir) * t;
+		if (y > tool->max_y || y < 0)
+			return (-1);
+		i = column;
+		j = (int)y;
+		printf("x = %d y = %f\n\n", column, y);
+	}
+	//printf("\nx = %d y = %f\n\n", column, y);
+	my_mlx_pixel_put(tool, column * tool->case_len, y * tool->case_len, 0x00FFFFFF);
+	return (dist(tool, column, y));
+}
+
+double hit_row(tools *tool, int row)
+{
+	double t;
+	double x;
+	int i;
+	int j;
+
+	i = -5;
+	sin(tool->dir) > 0 ? row++ : row--;
+	while (i == -5 || !((sin(tool->dir) > 0 && (tool->map[j - 1][i] == '1' || tool->map[j - 1][i] == ' ')) || (sin(tool->dir) < 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' '))))
+	{
+		sin(tool->dir) > 0 ? row-- : row++;
+		t = (row - tool->posy) / (-1 * sin(tool->dir)); // pour la row
+		x = tool->posx + cos(tool->dir) * t;
+		if (x > ft_strlen(tool->map[0]) || x < 0)
+			return (-1);
+		i = (int)x;
+		j = row;
+	}
+	my_mlx_pixel_put(tool, x * tool->case_len, row * tool->case_len, 0x00FFFFFF);
+	return (dist(tool, x, row));
+}
+
+void new_calcul(tools *tool)
+{
+	int column;
+	int row;
+	double dist;
+	double dist_2;
+
+	column = (int)tool->posx;
+	row = (int)tool->posy;
+	//printf("%f\n", ft_round(cos(tool->dir)));
+	if (ft_round(cos(tool->dir)) != 0)
+	{
+		dist = hit_column(tool, column);
+	}
+	else
+		dist = -1;
+	if (ft_round(sin(tool->dir)) != 0)
+		dist_2 = hit_row(tool, row);
+	else
+		dist_2 = -1;
+	dist = dist == -1 ? dist_2 : dist;
+	dist_2 = dist_2 == -1 ? dist : dist_2;
+	printf("dist_col = %f\n", dist);
+	printf("dist_row = %f\n", dist_2);
+	dist = dist_2 < dist ? dist_2 : dist;
+}
+
 void display_dir(tools *tool)
 {
 	double x;
@@ -232,7 +326,7 @@ void display_dir(tools *tool)
 	int i;
 	int j;
 
-	color = 0x00FFFF00;
+	color = 0x00FF0000;
 	x = tool->posx * (double)tool->case_len;
 	y = tool->posy * (double)tool->case_len;
 	while (1)
@@ -243,13 +337,14 @@ void display_dir(tools *tool)
 		i = x / tool->case_len;
 		j = y / tool->case_len;
 		if (y<1)
-			return ;
+			break ;
 		//printf("y = %f dir = %f\n", y, sin(tool->dir));
 		if (y == fabs(y) && ((sin(tool->dir) > 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' ')) || (sin(tool->dir) < 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' '))))
-			return ;
+			break ;
 		//if (x == fabs(x) && ((cos(tool->dir) > 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' ')) || (cos(tool->dir) < 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' '))))
 		//	return ;
 	}
+	new_calcul(tool);
 }
 
 void display_angle(tools *tool)
@@ -349,12 +444,12 @@ void move_right(tools *tool)
 
 void rotate_left(tools *tool)
 {
-	tool->dir += tool->speed;
+	tool->dir += 0.000625;//tool->speed;
 }
 
 void rotate_right(tools *tool)
 {
-	tool->dir -= tool->speed;
+	tool->dir -= 0.000625;//tool->speed;
 }
 
 int hit_north(tools *tool)
@@ -521,10 +616,11 @@ void move_player(tools *tool)
 		printf("dir = %f\n", tool->dir);
 		create_grid(tool);
 		display_player(tool);
-		//display_dir(tool);
-		display_angle(tool);
+		display_dir(tool);
+		//display_angle(tool);
+		//new_calcul(tool);
 		mlx_put_image_to_window(tool->mlx_ptr, tool->win_ptr, tool->img_ptrnew, 0, 0);
-		printf("x = %f y = %f\n", tool->posx, tool->posy);
+		//printf("x = %f y = %f\n", tool->posx, tool->posy);
 		//refresh(tool);
 	}
 }
