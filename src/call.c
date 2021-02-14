@@ -22,7 +22,6 @@ void struct_init(tools *tool)
 	tool->keyright = 0;
 	tool->mlx_ptr = mlx_init();
 	tool->win_ptr = mlx_new_window(tool->mlx_ptr, tool->res_x, tool->res_y, tool->title);
-	tool->img_ptr = mlx_xpm_file_to_image(tool->mlx_ptr, "eagle.xpm", &tool->width, &tool->height);
 	//tool->img_ptrblank = mlx_new_image(tool->mlx_ptr, 1000, 1000);
 	tool->speed = 0;
 }

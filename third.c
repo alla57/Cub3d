@@ -32,10 +32,18 @@ void my_mlx_pixel_put(tools *tool, int x, int y, int color)
 	*(unsigned int*)dst = color; // essayer avec (unsigned int)(*dst) = color;
 }
 
-unsigned int get_pixel(tools *tool, int x, int y)
+unsigned int get_pixel(tools *tool, int x, int y, int texture)
 {
 	char *dst;
 
+	if (texture)
+		tool->addr_no = mlx_get_data_addr(tool->img_ptr_no, &tool->bits_per_pixel_2, &tool->line_length_2, &tool->endian_2);
+	else if (texture)
+		tool->addr_no = mlx_get_data_addr(tool->img_ptr_no, &tool->bits_per_pixel_2, &tool->line_length_2, &tool->endian_2);
+	else if (texture)
+		tool->addr_no = mlx_get_data_addr(tool->img_ptr_no, &tool->bits_per_pixel_2, &tool->line_length_2, &tool->endian_2);
+	else if (texture)
+		tool->addr_no = mlx_get_data_addr(tool->img_ptr_no, &tool->bits_per_pixel_2, &tool->line_length_2, &tool->endian_2);
 	dst = tool->addr_no + (y * tool->line_length_2 + x * (tool->bits_per_pixel_2/8));
 	return (*(unsigned int*)dst);
 }
@@ -44,43 +52,44 @@ void create_img_addr(tools *tool)
 {
 	tool->img_ptrnew = mlx_new_image(tool->mlx_ptr, tool->res_x, tool->res_y);
 	tool->addr = mlx_get_data_addr(tool->img_ptrnew, &tool->bits_per_pixel, &tool->line_length, &tool->endian);
+	tool->img_ptr_no = mlx_xpm_file_to_image(tool->mlx_ptr, tool->no_path, &tool->width, &tool->height); //rename height to img_height
+	tool->img_ptr_so = mlx_xpm_file_to_image(tool->mlx_ptr, tool->so_path, &tool->width, &tool->height); //rename height to img_height
+	tool->img_ptr_ea = mlx_xpm_file_to_image(tool->mlx_ptr, tool->ea_path, &tool->width, &tool->height); //rename height to img_height
+	tool->img_ptr_we = mlx_xpm_file_to_image(tool->mlx_ptr, tool->we_path, &tool->width, &tool->height); //rename height to img_height
+	//tool->addr_no = mlx_get_data_addr(tool->img_ptr, &tool->bits_per_pixel_2, &tool->line_length_2, &tool->endian_2);
 }
 
-void get_img(tools *tool)
+void get_img(tools *tool, int x, int *y, double height, double hit_x)
 {
-	int x;
-	int y;
+	int x_src;
+	int y_src;
 	int x_2;
 	int y_2;
 	int color;
 	double fx;
 	double fy;
-	int height;
 	int width;
+    int a;
 
-	x = -1;
-	height = 500;
-	width = 250;
+	width = height;
 	fx = 64/(double)width;
 	fy = 64/(double)height;
-	x_2 = 0;
-	tool->img_ptr = mlx_xpm_file_to_image(tool->mlx_ptr, tool->no_path, &tool->width, &tool->height); //rename height to img_height
-	tool->addr_no = mlx_get_data_addr(tool->img_ptr, &tool->bits_per_pixel_2, &tool->line_length_2, &tool->endian_2);
-	while (x_2 < width)
-	{
-		x = x_2 * fx;
-		y_2 = 0;
-		while (y_2 < height)
-		{
-			y = y_2 * fy;
-			color = get_pixel(tool, x, y);
-			my_mlx_pixel_put(tool, x_2, y_2, color);
-			++y_2;
-		}
-		++x_2;
-		--height;
-		fy = 64/(double)height;
-	}
+    a = (int)hit_x;
+	x_2 = (hit_x - (double)a)  * (float)width;
+    x_src = x_2 * fx;
+    y_2 = 0;
+	if (height > tool->res_y)
+		y_2 = (height - tool->res_y) / 2;
+    while (y_2 < height && *y < tool->res_y)
+    {
+        y_src = y_2 * fy;
+        color = get_pixel(tool, x_src, y_src, 1);
+		//printf("x = %d\n", x, y);
+        my_mlx_pixel_put(tool, x, *y, color);
+        ++y_2;
+		++*y;
+    }
+    ++x_2;
 }
 
 void init_player_pos(tools *tool)
@@ -89,7 +98,7 @@ void init_player_pos(tools *tool)
 	tool->posx = tool->pos_player[1] + 0.5;
 }
 
-void draw_column(double height, int column, int color, tools *tool)
+void draw_column(double height, int column, double hit_x, tools *tool)
 {
 	int x;
 	int y;
@@ -104,10 +113,7 @@ void draw_column(double height, int column, int color, tools *tool)
 		my_mlx_pixel_put(tool, x, y++, 0x00000000);
 	}
 	i = -1;
-	while (++i < height && i < tool->res_y)
-	{
-		my_mlx_pixel_put(tool, x, y++, color);
-	}
+    get_img(tool, x, &y, height, hit_x);
 	i = -1;
 	while (y < tool->res_y)//tool->res_y - heigh) / 2)
 	{
@@ -138,7 +144,7 @@ double dist(tools *tool, double x, double y)
 	return (sqrt(x + y));
 }
 
-double hit_column(tools *tool, int column, int *color)
+double hit_column(tools *tool, int column, double *hit_y)
 {
 	double t;
 	double y;
@@ -158,13 +164,11 @@ double hit_column(tools *tool, int column, int *color)
 		j = (int)y;
 		//printf("x = %d y = %f\n", column, y);
 	}
-	*color = 0x00A70039;
-	if (ft_pair(y))
-		*color = 0x00C70039;
+	*hit_y = y;
 	return (dist(tool, column, y));
 }
 
-double hit_row(tools *tool, int row, int *color)
+double hit_row(tools *tool, int row, double *hit_x)
 {
 	double t;
 	double x;
@@ -183,9 +187,7 @@ double hit_row(tools *tool, int row, int *color)
 		i = (int)x;
 		j = row;
 	}
-	*color = 0x0018D68D;
-	if (ft_pair(x))
-		*color = 0x0058D68D;
+	*hit_x = x;
 	return (dist(tool, x, row));
 }
 
@@ -196,31 +198,31 @@ void new_calcul(tools *tool, int col, int color)
 	double dist;
 	double dist_2;
 	double height;
-	int color_2;
+	double hit_x;
+    double hit_y;
 
-	color_2 = 0;
 	column = (int)tool->posx;
 	row = (int)tool->posy;
 	if (ft_round(cos(tool->dir)) != 0)
 	{
-		dist = hit_column(tool, column, &color);
+		dist = hit_column(tool, column, &hit_y);
 	}
 	else
 		dist = -1;
 	if (ft_round(sin(tool->dir)) != 0)
-		dist_2 = hit_row(tool, row, &color_2);
+		dist_2 = hit_row(tool, row, &hit_x);
 	else
 		dist_2 = -1;
 	if ((dist < dist_2 && dist != -1) || dist_2 == -1)
-		color = color;//0x00C70039;
+		hit_x = hit_y;//0x00C70039;
 	else
-		color = color_2;//0x0058D68D;
+		hit_x = hit_x;//0x0058D68D;
 	dist = dist == -1 ? dist_2 : dist;
 	dist_2 = dist_2 == -1 ? dist : dist_2;
 	dist = dist_2 < dist ? dist_2 : dist;
 	dist = dist * cos(fabs(tool->ray_dir));
-	height = (tool->res_y * 1.5) / dist;// height = (tool->res_y * 31)/ (dist * tool->case_len);
-	draw_column(height, col, color, tool);
+	height = (tool->res_y * (tool->res_x / tool->res_y)) / dist;// height = (tool->res_y * 31)/ (dist * tool->case_len);
+	draw_column(height, col, hit_x, tool);
 }
 
 void raycasting(tools *tool) //display_angle
@@ -232,10 +234,10 @@ void raycasting(tools *tool) //display_angle
 
 	color = 0;
 	olddir = tool->dir;
-	tool->dir += 0.55;
+	tool->dir += 0.5;
 	column = 0;
-	len_column = 1.1 / tool->res_x;//len_column = tool->res_x / (1.2/0.005);
-	tool->ray_dir = 0.55;
+	len_column = 1.0 / tool->res_x;//len_column = tool->res_x / (1.2/0.005);
+	tool->ray_dir = 0.5;
 	while (column < tool->res_x)//(tool->dir > olddir - 0.6)
 	{
 		new_calcul(tool, column, color);

@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <math.h>
-//#include "../minilibx-linux/mlx.h"
-#include "../minilibx_opengl_20191021/mlx.h"
+#include "../minilibx-linux/mlx.h"
+//#include "../minilibx_opengl_20191021/mlx.h"
 //#include "get_next_line.h"
 #include "../Libft/libft.h"
 
@@ -18,7 +18,10 @@ typedef struct
 {
 	void    *mlx_ptr;
 	void	*win_ptr;
-	void	*img_ptr;
+	void	*img_ptr_no;
+	void	*img_ptr_so;
+	void	*img_ptr_ea;
+	void	*img_ptr_we;
 	void	*img_ptrnew;//////////// a supprimer plus tard
 	char	*no_path;
 	char	*so_path;
@@ -49,7 +52,10 @@ typedef struct
 	int pos_x; //a supprimer
 	int pos_y; //a supprimer
 	char *addr;
-	char *addr_2;
+	char *addr_no;
+	char *addr_so;
+	char *addr_ea;
+	char *addr_we;
 	int bits_per_pixel;
 	int line_length;
 	int endian;

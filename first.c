@@ -1,5 +1,5 @@
-//#include "./minilibx-linux/mlx.h"
-#include "minilibx_opengl_20191021/mlx.h"
+#include "./minilibx-linux/mlx.h"
+//#include "minilibx_opengl_20191021/mlx.h"
 #include <stdio.h>
 #include <unistd.h>
 #include "include/cub3d.h"
@@ -627,17 +627,17 @@ void move_player(tools *tool)
 
 int 	press(int keycode, tools *tool) //old
 {
-	if (keycode == 13) //13 122
+	if (keycode == 122) //13 122
 		tool->keyup = 1;
-	if (keycode == 0) //0 113
+	if (keycode == 113) //0 113
 		tool->keyleft = 1;
-	if (keycode == 1) //1 115
+	if (keycode == 115) //1 115
 		tool->keydown = 1;
-	if (keycode == 2) //2 100
+	if (keycode == 100) //2 100
 		tool->keyright = 1;
-	if (keycode == 123)
+	if (keycode == 65361) //123 65361
 		tool->rotate_left = 1;
-	if (keycode == 124)
+	if (keycode == 65363) //124 65363
 		tool->rotate_right = 1;
 	move_player(tool);
 	printf("je suis dans press et le keycode est %d\n", keycode);
@@ -646,17 +646,17 @@ int 	press(int keycode, tools *tool) //old
 
 int		release(int keycode, tools *tool) //old
 {
-	if (keycode == 13) //13 122
+	if (keycode == 122) //13 122
 		tool->keyup = 0;
-	if (keycode == 0) //0 113
+	if (keycode == 113) //0 113
 		tool->keyleft = 0;
-	if (keycode == 1) //1 115
+	if (keycode == 115) //1 115
 		tool->keydown = 0;
-	if (keycode == 2) //2 100
+	if (keycode == 100) //2 100
 		tool->keyright = 0;
-	if (keycode == 123)
+	if (keycode == 65361) //123 65361
 		tool->rotate_left = 0;
-	if (keycode == 124)
+	if (keycode == 65363) //124 65363
 		tool->rotate_right = 0;
 	printf("keyrelease\n");
 	return 1;

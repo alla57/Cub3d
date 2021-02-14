@@ -1,8 +1,8 @@
-R 1920 1080
-NO ./eagle.xpm
+R 1000 1000
+NO ./redbrick.xpm
 SO ./eagle.xpm
-WE ./eagle.xpm
-EA ./eagle.xpm
+WE ./bluestone.xpm
+EA ./greystone.xpm
 
 S ./eagle.xpm
 F 120,255,255
