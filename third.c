@@ -1,5 +1,5 @@
-#include "./minilibx-linux/mlx.h"
-//#include "minilibx_opengl_20191021/mlx.h"
+//#include "./minilibx-linux/mlx.h"
+#include "minilibx_opengl_20191021/mlx.h"
 #include <stdio.h>
 #include <unistd.h>
 #include "include/cub3d.h"
@@ -29,22 +29,15 @@ void my_mlx_pixel_put(tools *tool, int x, int y, int color)
 	char *dst;
 
 	dst = tool->addr + (y * tool->line_length + x * (tool->bits_per_pixel/8));
-	*(unsigned int*)dst = color; // essayer avec (unsigned int)(*dst) = color;
+	*(unsigned int*)dst = color;
 }
 
-unsigned int get_pixel(tools *tool, int x, int y, int texture)
+unsigned int get_pixel(tools *tool, int x, int y)
 {
 	char *dst;
 
-	if (texture)
-		tool->addr_no = mlx_get_data_addr(tool->img_ptr_no, &tool->bits_per_pixel_2, &tool->line_length_2, &tool->endian_2);
-	else if (texture)
-		tool->addr_no = mlx_get_data_addr(tool->img_ptr_no, &tool->bits_per_pixel_2, &tool->line_length_2, &tool->endian_2);
-	else if (texture)
-		tool->addr_no = mlx_get_data_addr(tool->img_ptr_no, &tool->bits_per_pixel_2, &tool->line_length_2, &tool->endian_2);
-	else if (texture)
-		tool->addr_no = mlx_get_data_addr(tool->img_ptr_no, &tool->bits_per_pixel_2, &tool->line_length_2, &tool->endian_2);
-	dst = tool->addr_no + (y * tool->line_length_2 + x * (tool->bits_per_pixel_2/8));
+	tool->addr_texture = mlx_get_data_addr(tool->texture, &tool->bits_per_pixel_2, &tool->line_length_2, &tool->endian_2);
+	dst = tool->addr_texture + (y * tool->line_length_2 + x * (tool->bits_per_pixel_2/8));
 	return (*(unsigned int*)dst);
 }
 
@@ -56,15 +49,38 @@ void create_img_addr(tools *tool)
 	tool->img_ptr_so = mlx_xpm_file_to_image(tool->mlx_ptr, tool->so_path, &tool->width, &tool->height); //rename height to img_height
 	tool->img_ptr_ea = mlx_xpm_file_to_image(tool->mlx_ptr, tool->ea_path, &tool->width, &tool->height); //rename height to img_height
 	tool->img_ptr_we = mlx_xpm_file_to_image(tool->mlx_ptr, tool->we_path, &tool->width, &tool->height); //rename height to img_height
-	//tool->addr_no = mlx_get_data_addr(tool->img_ptr, &tool->bits_per_pixel_2, &tool->line_length_2, &tool->endian_2);
 }
 
 void get_img(tools *tool, int x, int *y, double height, double hit_x)
 {
+	calcul c;
+
+	c.width = height;
+	c.fx = tool->width/(double)height;
+	c.fy = tool->height/(double)height;
+    c.a = (int)hit_x;
+    c.y_dest = 0;
+	c.x_dest = (hit_x - (double)c.a)  * (float)c.width;
+    c.x_src = c.x_dest * c.fx;
+	if (height > tool->res_y)
+		c.y_dest = (height - tool->res_y) / 2;
+    while (c.y_dest < height && *y < tool->res_y)
+    {
+        c.y_src = c.y_dest * c.fy;
+        c.color = get_pixel(tool, c.x_src, c.y_src);
+        my_mlx_pixel_put(tool, x, *y, c.color);
+        ++c.y_dest;
+		++*y;
+    }
+    ++c.x_dest;
+}
+/*
+void get_img(tools *tool, int x, int *y, double height, double hit_x)
+{
 	int x_src;
 	int y_src;
-	int x_2;
-	int y_2;
+	int x_dest;
+	int y_dest;
 	int color;
 	double fx;
 	double fy;
@@ -75,22 +91,21 @@ void get_img(tools *tool, int x, int *y, double height, double hit_x)
 	fx = 64/(double)width;
 	fy = 64/(double)height;
     a = (int)hit_x;
-	x_2 = (hit_x - (double)a)  * (float)width;
-    x_src = x_2 * fx;
-    y_2 = 0;
+	x_dest = (hit_x - (double)a)  * (float)width;
+    x_src = x_dest * fx;
+    y_dest = 0;
 	if (height > tool->res_y)
-		y_2 = (height - tool->res_y) / 2;
-    while (y_2 < height && *y < tool->res_y)
+		y_dest = (height - tool->res_y) / 2;
+    while (y_dest < height && *y < tool->res_y)
     {
-        y_src = y_2 * fy;
-        color = get_pixel(tool, x_src, y_src, 1);
-		//printf("x = %d\n", x, y);
+        y_src = y_dest * fy;
+        color = get_pixel(tool, x_src, y_src);
         my_mlx_pixel_put(tool, x, *y, color);
-        ++y_2;
+        ++y_dest;
 		++*y;
     }
-    ++x_2;
-}
+    ++x_dest;
+}*/
 
 void init_player_pos(tools *tool)
 {
@@ -103,21 +118,18 @@ void draw_column(double height, int column, double hit_x, tools *tool)
 	int x;
 	int y;
 	int i;
-	//int color;
 
 	i = -1;
 	x = column;
 	y = 0;
 	while (++i < (tool->res_y - height) / 2)
 	{
-		my_mlx_pixel_put(tool, x, y++, 0x00000000);
+		my_mlx_pixel_put(tool, x, y++, tool->c_color);
 	}
-	i = -1;
     get_img(tool, x, &y, height, hit_x);
-	i = -1;
-	while (y < tool->res_y)//tool->res_y - heigh) / 2)
+	while (y < tool->res_y)
 	{
-		my_mlx_pixel_put(tool, x, y++, 0x00000000);
+		my_mlx_pixel_put(tool, x, y++, tool->f_color);
 	}
 }
 
@@ -156,13 +168,12 @@ double hit_column(tools *tool, int column, double *hit_y)
 	while (i == -5 || !((cos(tool->dir) < 0 && (tool->map[j][i - 1] == '1' || tool->map[j][i - 1] == ' ')) || (cos(tool->dir) > 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' '))))
 	{
 		cos(tool->dir) > 0 ? column++ : column--;
-		t = (column - tool->posx) / cos(tool->dir); //pour la colonne
+		t = (column - tool->posx) / cos(tool->dir);
 		y = tool->posy - sin(tool->dir) * t;
 		if (y > tool->max_y || y < 0)
 			return (-1);
 		i = column;
 		j = (int)y;
-		//printf("x = %d y = %f\n", column, y);
 	}
 	*hit_y = y;
 	return (dist(tool, column, y));
@@ -180,7 +191,7 @@ double hit_row(tools *tool, int row, double *hit_x)
 	while (i == -5 || !((sin(tool->dir) > 0 && (tool->map[j - 1][i] == '1' || tool->map[j - 1][i] == ' ')) || (sin(tool->dir) < 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' '))))
 	{
 		sin(tool->dir) > 0 ? row-- : row++;
-		t = (row - tool->posy) / (-1 * sin(tool->dir)); // pour la row
+		t = (row - tool->posy) / (-1 * sin(tool->dir));
 		x = tool->posx + cos(tool->dir) * t;
 		if (x > ft_strlen(tool->map[0]) || x < 0)
 			return (-1);
@@ -191,61 +202,90 @@ double hit_row(tools *tool, int row, double *hit_x)
 	return (dist(tool, x, row));
 }
 
-void new_calcul(tools *tool, int col, int color)
+void get_texture(tools *tool, int hit)
 {
 	int column;
 	int row;
+
+	column = 0;
+	row = 1;
+	if (hit == column)
+	{
+		if (cos(tool->dir) > 0)
+			tool->texture = tool->img_ptr_ea;
+		else
+			tool->texture = tool->img_ptr_we; //we_path
+	}
+	else if (hit == row)
+	{
+		if (sin(tool->dir) > 0)
+			tool->texture = tool->img_ptr_no;
+		else
+			tool->texture = tool->img_ptr_so;
+	}
+	return ;
+}
+
+double get_dist(tools *tool, double *hit_x, double hit_y)
+{
 	double dist;
 	double dist_2;
+	int column;
+	int row;
+
+	column = (int)tool->posx;
+	row = (int)tool->posy;
+	dist = -1;
+	dist_2 = -1;
+	if (ft_round(cos(tool->dir)) != 0)
+		dist = hit_column(tool, column, &hit_y);
+	if (ft_round(sin(tool->dir)) != 0)
+		dist_2 = hit_row(tool, row, hit_x);
+	if ((dist < dist_2 && dist != -1) || dist_2 == -1)
+	{
+		*hit_x = hit_y;
+		get_texture(tool, 0);
+	}
+	else
+	{
+		dist = dist_2;
+		get_texture(tool, 1);
+	}
+	return (dist);
+}
+
+void new_calcul(tools *tool, int col)
+{
+	double dist;
 	double height;
 	double hit_x;
     double hit_y;
 
-	column = (int)tool->posx;
-	row = (int)tool->posy;
-	if (ft_round(cos(tool->dir)) != 0)
-	{
-		dist = hit_column(tool, column, &hit_y);
-	}
-	else
-		dist = -1;
-	if (ft_round(sin(tool->dir)) != 0)
-		dist_2 = hit_row(tool, row, &hit_x);
-	else
-		dist_2 = -1;
-	if ((dist < dist_2 && dist != -1) || dist_2 == -1)
-		hit_x = hit_y;//0x00C70039;
-	else
-		hit_x = hit_x;//0x0058D68D;
-	dist = dist == -1 ? dist_2 : dist;
-	dist_2 = dist_2 == -1 ? dist : dist_2;
-	dist = dist_2 < dist ? dist_2 : dist;
+	dist = get_dist(tool, &hit_x, hit_y);
 	dist = dist * cos(fabs(tool->ray_dir));
-	height = (tool->res_y * (tool->res_x / tool->res_y)) / dist;// height = (tool->res_y * 31)/ (dist * tool->case_len);
+	height = (tool->res_y * (tool->res_x / tool->res_y)) / dist;
 	draw_column(height, col, hit_x, tool);
 }
 
 void raycasting(tools *tool) //display_angle
 {
-	double olddir;
+	double one_ray;
+	double temp;
 	int column;
-	double len_column;
-	int color;
 
-	color = 0;
-	olddir = tool->dir;
-	tool->dir += 0.5;
 	column = 0;
-	len_column = 1.0 / tool->res_x;//len_column = tool->res_x / (1.2/0.005);
+	temp = tool->dir;
+	tool->dir += 0.5;
+	one_ray = 1.0 / tool->res_x;
 	tool->ray_dir = 0.5;
-	while (column < tool->res_x)//(tool->dir > olddir - 0.6)
+	while (column < tool->res_x)
 	{
-		new_calcul(tool, column, color);
-		tool->dir -= len_column;//tool->dir -= 0.005;
-		tool->ray_dir -= len_column;//tool->ray_dir -= 0.005;
-		++column;//column += len_column;
+		new_calcul(tool, column);
+		tool->dir -= one_ray;
+		tool->ray_dir -= one_ray;
+		++column;
 	}
-	tool->dir = olddir;
+	tool->dir = temp;
 }
 
 void move_forward(tools *tool)
@@ -453,17 +493,17 @@ void move_player(tools *tool)
 
 int 	press(int keycode, tools *tool) //old
 {
-	if (keycode == 122) //13 122
+	if (keycode == 13) //13 122
 		tool->keyup = 1;
-	if (keycode == 113) //0 113
+	if (keycode == 0) //0 113
 		tool->keyleft = 1;
-	if (keycode == 115) //1 115
+	if (keycode == 1) //1 115
 		tool->keydown = 1;
-	if (keycode == 100) //2 100
+	if (keycode == 2) //2 100
 		tool->keyright = 1;
-	if (keycode == 65361) //123 65361
+	if (keycode == 123) //123 65361
 		tool->rotate_left = 1;
-	if (keycode == 65363) //123 65363
+	if (keycode == 124) //124 65363
 		tool->rotate_right = 1;
 	move_player(tool);
 	//printf("je suis dans press et le keycode est %d\n", keycode);
@@ -472,17 +512,17 @@ int 	press(int keycode, tools *tool) //old
 
 int		release(int keycode, tools *tool) //old
 {
-	if (keycode == 122) //13 122
+	if (keycode == 13) //13 122
 		tool->keyup = 0;
-	if (keycode == 113) //0 113
+	if (keycode == 0) //0 113
 		tool->keyleft = 0;
-	if (keycode == 115) //1 115
+	if (keycode == 1) //1 115
 		tool->keydown = 0;
-	if (keycode == 100) //2 100
+	if (keycode == 2) //2 100
 		tool->keyright = 0;
-	if (keycode == 65361) //123 65361
+	if (keycode == 123) //123 65361
 		tool->rotate_left = 0;
-	if (keycode == 65363) //123 65363
+	if (keycode == 124) //124 65363
 		tool->rotate_right = 0;
 	printf("keyrelease\n");
 	return 1;

@@ -1,5 +1,5 @@
-#include "./minilibx-linux/mlx.h"
-//#include "minilibx_opengl_20191021/mlx.h"
+//#include "./minilibx-linux/mlx.h"
+#include "minilibx_opengl_20191021/mlx.h"
 #include <stdio.h>
 #include <unistd.h>
 #include "include/cub3d.h"
