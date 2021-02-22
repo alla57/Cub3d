@@ -22,6 +22,7 @@ typedef struct
 	void	*img_ptr_so;
 	void	*img_ptr_ea;
 	void	*img_ptr_we;
+	void	*img_ptr_sp;
 	void	*texture;
 	void	*img_ptrnew;//////////// a supprimer plus tard
 	char	*no_path;
@@ -29,6 +30,8 @@ typedef struct
 	char	*ea_path;
 	char	*we_path;
 	char	*sprite_path;
+	int		sprite_col;
+	int		sprite_row;
 	char	**map;
 	int		res_x;
 	int		res_y;
@@ -65,6 +68,7 @@ typedef struct
 	int rotate_left;
 	int rotate_right;
 	double ray_dir;
+	double hit[3];
 }tools;
 
 typedef struct

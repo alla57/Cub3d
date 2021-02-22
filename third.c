@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   third.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: alboumed <alboumed@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/02/22 14:47:34 by alboumed          #+#    #+#             */
+/*   Updated: 2021/02/22 16:10:57 by alboumed         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 //#include "./minilibx-linux/mlx.h"
 #include "minilibx_opengl_20191021/mlx.h"
 #include <stdio.h>
@@ -7,6 +19,8 @@
 
 void init_param(tools *tool)
 {
+	tool->sprite_col = 0;
+	tool->sprite_row = 0;
 	tool->keyup = 0;
 	tool->keyleft = 0;
 	tool->keydown = 0;
@@ -49,18 +63,19 @@ void create_img_addr(tools *tool)
 	tool->img_ptr_so = mlx_xpm_file_to_image(tool->mlx_ptr, tool->so_path, &tool->width, &tool->height); //rename height to img_height
 	tool->img_ptr_ea = mlx_xpm_file_to_image(tool->mlx_ptr, tool->ea_path, &tool->width, &tool->height); //rename height to img_height
 	tool->img_ptr_we = mlx_xpm_file_to_image(tool->mlx_ptr, tool->we_path, &tool->width, &tool->height); //rename height to img_height
+	tool->img_ptr_sp = mlx_xpm_file_to_image(tool->mlx_ptr, tool->sprite_path, &tool->width, &tool->height); //rename height to img_height
 }
 
-void get_img(tools *tool, int x, int *y, double height, double hit_x)
+void get_img(tools *tool, int x, int *y, double height)
 {
 	calcul c;
 
 	c.width = height;
 	c.fx = tool->width/(double)height;
 	c.fy = tool->height/(double)height;
-    c.a = (int)hit_x;
+    c.a = (int)tool->hit[2];
     c.y_dest = 0;
-	c.x_dest = (hit_x - (double)c.a)  * (float)c.width;
+	c.x_dest = (tool->hit[2] - (double)c.a)  * (float)c.width;
     c.x_src = c.x_dest * c.fx;
 	if (height > tool->res_y)
 		c.y_dest = (height - tool->res_y) / 2;
@@ -68,44 +83,13 @@ void get_img(tools *tool, int x, int *y, double height, double hit_x)
     {
         c.y_src = c.y_dest * c.fy;
         c.color = get_pixel(tool, c.x_src, c.y_src);
-        my_mlx_pixel_put(tool, x, *y, c.color);
+		if (!(tool->texture == tool->img_ptr_sp && c.color == 0x00000000))
+        	my_mlx_pixel_put(tool, x, *y, c.color);
         ++c.y_dest;
 		++*y;
     }
     ++c.x_dest;
 }
-/*
-void get_img(tools *tool, int x, int *y, double height, double hit_x)
-{
-	int x_src;
-	int y_src;
-	int x_dest;
-	int y_dest;
-	int color;
-	double fx;
-	double fy;
-	int width;
-    int a;
-
-	width = height;
-	fx = 64/(double)width;
-	fy = 64/(double)height;
-    a = (int)hit_x;
-	x_dest = (hit_x - (double)a)  * (float)width;
-    x_src = x_dest * fx;
-    y_dest = 0;
-	if (height > tool->res_y)
-		y_dest = (height - tool->res_y) / 2;
-    while (y_dest < height && *y < tool->res_y)
-    {
-        y_src = y_dest * fy;
-        color = get_pixel(tool, x_src, y_src);
-        my_mlx_pixel_put(tool, x, *y, color);
-        ++y_dest;
-		++*y;
-    }
-    ++x_dest;
-}*/
 
 void init_player_pos(tools *tool)
 {
@@ -122,11 +106,12 @@ void draw_column(double height, int column, double hit_x, tools *tool)
 	i = -1;
 	x = column;
 	y = 0;
+	tool->hit[2] = hit_x;
 	while (++i < (tool->res_y - height) / 2)
 	{
 		my_mlx_pixel_put(tool, x, y++, tool->c_color);
 	}
-    get_img(tool, x, &y, height, hit_x);
+    get_img(tool, x, &y, height);
 	while (y < tool->res_y)
 	{
 		my_mlx_pixel_put(tool, x, y++, tool->f_color);
@@ -149,11 +134,100 @@ double ft_round(double n)
 
 double dist(tools *tool, double x, double y)
 {
+	int a;
+	int b;
+
+	a = (int)x;
+	b = (int)y;
+	if ((tool->sprite_col && (double)a == x) || (tool->sprite_row && (double)b == y))
+	{
+		x = tool->hit[0];
+		y = tool->hit[1];
+	}
 	x -= tool->posx;
 	y -= tool->posy;
 	x = x * x;
 	y = y * y;
 	return (sqrt(x + y));
+}
+
+void rotate_sprite(tools *tool, int i, int j)
+{
+	double x;
+	double y;
+	double t;
+
+	x = (double)i + 0.5;
+	y = (double)j + 0.5;
+	t = (x - (double)i) / sin(tool->dir);
+	x = x - sin(tool->dir) * t;
+	y = y - cos(tool->dir) * t;
+	if ((int)x == i && (int)y == (j))
+	{
+		tool->hit[2] = tool->hit[0];
+	}
+	else
+	{
+		tool->hit[2] = tool->hit[1];
+	}
+}
+
+void hit_sprite(tools *tool, int i, int j)
+{
+	double x;
+	double y;
+	double t;
+
+	x = (double)i + 0.5;
+	y = (double)j + 0.5;
+	t = (cos(tool->dir) * tool->posy - sin(tool->dir) * x + sin(tool->dir) * tool->posx - cos(tool->dir) * y) / (-1 * (cos(tool->dir) * cos(tool->dir) + sin(tool->dir) * sin(tool->dir)));
+	x = x - sin(tool->dir) * t;
+	y = y - cos(tool->dir) * t;
+	if (x < (double)i)
+	{
+		tool->sprite_col = 0;
+		tool->sprite_row = 0;
+		return ;
+	}
+	tool->hit[0] = x;
+	tool->hit[1] = y;
+	rotate_sprite(tool, i, j);
+}
+
+void hit_column_sprite_2(tools *tool, int i, int j, double *hit_y)
+{
+	if ((cos(tool->dir) < 0 && tool->map[j][i - 1] == '2') || (cos(tool->dir) > 0 && tool->map[j][i] == '2'))
+	{
+		(cos(tool->dir) < 0 && tool->map[j][i - 1] == '2') ? --i : 1;
+		tool->sprite_col = 1;
+		hit_sprite(tool, i, j);
+		*hit_y = tool->hit[2];
+	}
+}
+
+double hit_column_sprite(tools *tool, int column, double *hit_y)
+{
+	double t;
+	double y;
+	int i;
+	int j;
+	double hit[2];
+
+	i = -5;
+	tool->sprite_col = 0;
+	cos(tool->dir) > 0 ? column : column++;
+	while (i == -5 || !((cos(tool->dir) < 0 && (tool->map[j][i - 1] == '1' || tool->map[j][i - 1] == ' ' || tool->map[j][i - 1] == '2')) || (cos(tool->dir) > 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' ' || tool->map[j][i] == '2'))))
+	{
+		cos(tool->dir) > 0 ? column++ : column--;
+		t = (column - tool->posx) / cos(tool->dir);
+		y = tool->posy - sin(tool->dir) * t;
+		if (y > tool->max_y || y < 0)
+			return (-1);
+		i = column;
+		j = (int)y;
+	}
+	hit_column_sprite_2(tool, i, j, hit_y);
+	return (dist(tool, column, y));
 }
 
 double hit_column(tools *tool, int column, double *hit_y)
@@ -164,6 +238,7 @@ double hit_column(tools *tool, int column, double *hit_y)
 	int j;
 
 	i = -5;
+	tool->sprite_col = 0;
 	cos(tool->dir) > 0 ? column : column++;
 	while (i == -5 || !((cos(tool->dir) < 0 && (tool->map[j][i - 1] == '1' || tool->map[j][i - 1] == ' ')) || (cos(tool->dir) > 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' '))))
 	{
@@ -179,6 +254,41 @@ double hit_column(tools *tool, int column, double *hit_y)
 	return (dist(tool, column, y));
 }
 
+void hit_row_sprite_2(tools *tool, int i, int j, double *hit_x)
+{
+	if ((sin(tool->dir) > 0 && tool->map[j - 1][i] == '2') || (sin(tool->dir) < 0 && tool->map[j][i] == '2'))
+	{
+		(sin(tool->dir) > 0 && tool->map[j - 1][i] == '2') ? --j : 1;
+		tool->sprite_row = 1;
+		hit_sprite(tool, i, j);
+		*hit_x = tool->hit[2];
+	}
+}
+
+double hit_row_sprite(tools *tool, int row, double *hit_x)
+{
+	double t;
+	double x;
+	int i;
+	int j;
+
+	i = -5;
+	tool->sprite_row = 0;
+	sin(tool->dir) > 0 ? row++ : row;
+	while (i == -5 || !((sin(tool->dir) > 0 && (tool->map[j - 1][i] == '1' || tool->map[j - 1][i] == ' ' || tool->map[j - 1][i] == '2')) || (sin(tool->dir) < 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' ' || tool->map[j][i] == '2'))))
+	{
+		sin(tool->dir) > 0 ? row-- : row++;
+		t = (row - tool->posy) / (-1 * sin(tool->dir));
+		x = tool->posx + cos(tool->dir) * t;
+		if (x > ft_strlen(tool->map[0]) || x < 0)
+			return (-1);
+		i = (int)x;
+		j = row;
+	}
+	hit_row_sprite_2(tool, i, j, hit_x);
+	return (dist(tool, x, row));
+}
+
 double hit_row(tools *tool, int row, double *hit_x)
 {
 	double t;
@@ -187,6 +297,7 @@ double hit_row(tools *tool, int row, double *hit_x)
 	int j;
 
 	i = -5;
+	tool->sprite_row = 0;
 	sin(tool->dir) > 0 ? row++ : row;
 	while (i == -5 || !((sin(tool->dir) > 0 && (tool->map[j - 1][i] == '1' || tool->map[j - 1][i] == ' ')) || (sin(tool->dir) < 0 && (tool->map[j][i] == '1' || tool->map[j][i] == ' '))))
 	{
@@ -202,72 +313,104 @@ double hit_row(tools *tool, int row, double *hit_x)
 	return (dist(tool, x, row));
 }
 
-void get_texture(tools *tool, int hit)
+void get_texture(tools *tool, int hit, int sprite)
 {
 	int column;
 	int row;
 
 	column = 0;
 	row = 1;
-	if (hit == column)
+	if (hit == column && !sprite)
 	{
 		if (cos(tool->dir) > 0)
 			tool->texture = tool->img_ptr_ea;
 		else
 			tool->texture = tool->img_ptr_we; //we_path
 	}
-	else if (hit == row)
+	else if (hit == row && !sprite)
 	{
 		if (sin(tool->dir) > 0)
 			tool->texture = tool->img_ptr_no;
 		else
 			tool->texture = tool->img_ptr_so;
 	}
-	return ;
+	else if (sprite)
+		tool->texture = tool->img_ptr_sp;
+}
+
+double get_dist_sprite(tools *tool, double *hit_x, double hit_y)
+{
+	double dist;
+	double dist_2;
+
+	dist = -1;
+	dist_2 = -1;
+	if (ft_round(cos(tool->dir)) != 0)
+		dist = hit_column_sprite(tool, (int)tool->posx, &hit_y);
+	if (ft_round(sin(tool->dir)) != 0)
+		dist_2 = hit_row_sprite(tool, (int)tool->posy, hit_x);
+	if (dist != -1 && (dist < dist_2 || dist_2 == -1) && tool->sprite_col)
+	{
+		*hit_x = hit_y;
+		get_texture(tool, 0, tool->sprite_col);
+	}
+	else if (dist_2 != -1 && (dist_2 < dist || dist == -1) && tool->sprite_row)
+	{
+		dist = dist_2;
+		get_texture(tool, 1, tool->sprite_row);
+	}
+	else
+		dist = -1;
+	return (dist);
 }
 
 double get_dist(tools *tool, double *hit_x, double hit_y)
 {
 	double dist;
 	double dist_2;
-	int column;
-	int row;
 
-	column = (int)tool->posx;
-	row = (int)tool->posy;
 	dist = -1;
 	dist_2 = -1;
 	if (ft_round(cos(tool->dir)) != 0)
-		dist = hit_column(tool, column, &hit_y);
+		dist = hit_column(tool, (int)tool->posx, &hit_y);
 	if (ft_round(sin(tool->dir)) != 0)
-		dist_2 = hit_row(tool, row, hit_x);
+		dist_2 = hit_row(tool, (int)tool->posy, hit_x);
 	if ((dist < dist_2 && dist != -1) || dist_2 == -1)
 	{
 		*hit_x = hit_y;
-		get_texture(tool, 0);
+		get_texture(tool, 0, 0);
 	}
 	else
 	{
 		dist = dist_2;
-		get_texture(tool, 1);
+		get_texture(tool, 1, 0);
 	}
 	return (dist);
 }
 
-void new_calcul(tools *tool, int col)
+void new_calcul(tools *tool, int col, int sprite)
 {
 	double dist;
 	double height;
 	double hit_x;
     double hit_y;
 
-	dist = get_dist(tool, &hit_x, hit_y);
-	dist = dist * cos(fabs(tool->ray_dir));
+	if (!sprite)
+	{
+		dist = get_dist(tool, &hit_x, hit_y);
+		dist = dist * cos(fabs(tool->ray_dir));
+	}
+	else
+	{
+		dist = get_dist_sprite(tool, &hit_x, hit_y);
+	}
+	if (dist == -1)
+		return ;
 	height = (tool->res_y * (tool->res_x / tool->res_y)) / dist;
 	draw_column(height, col, hit_x, tool);
 }
 
-void raycasting(tools *tool) //display_angle
+void raycasting(tools *tool, int sprite) //display_angle
 {
 	double one_ray;
 	double temp;
@@ -280,12 +423,20 @@ void raycasting(tools *tool) //display_angle
 	tool->ray_dir = 0.5;
 	while (column < tool->res_x)
 	{
-		new_calcul(tool, column);
+		new_calcul(tool, column, sprite);
 		tool->dir -= one_ray;
 		tool->ray_dir -= one_ray;
 		++column;
 	}
 	tool->dir = temp;
+}
+
+void check_sprite(tools *tool)
+{
+	int sprite;
+
+	sprite = 1;
+	raycasting(tool, sprite);
 }
 
 void move_forward(tools *tool)
@@ -459,33 +610,21 @@ int hit_right(tools *tool)
 void move_player(tools *tool)
 {
 	if (tool->keyup && !hit_up(tool))
-	{
 		move_forward(tool);
-	}
 	if (tool->keyleft && !hit_left(tool))
-	{
 		move_left(tool);
-	}
 	if (tool->keydown && !hit_down(tool))
-	{
 		move_backward(tool);
-	}
 	if (tool->keyright && !hit_right(tool))
-	{
 		move_right(tool);
-	}
 	if (tool->rotate_left)
-	{
 		rotate_left(tool);
-	}
 	if (tool->rotate_right)
-	{
 		rotate_right(tool);
-	}
 	if (tool->keyup || tool->keydown || tool->keyleft || tool->keyright || tool->rotate_left || tool->rotate_right)
 	{
-		raycasting(tool);
-		//get_img(tool);
+		raycasting(tool, 0);
+		check_sprite(tool);
 		mlx_put_image_to_window(tool->mlx_ptr, tool->win_ptr, tool->img_ptrnew, 0, 0);
 		//printf("x = %f y = %f\n", tool->posx, tool->posy);
 	}
