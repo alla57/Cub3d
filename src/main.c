@@ -6,7 +6,7 @@
 /*   By: alboumed <alboumed@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 14:59:04 by alboumed          #+#    #+#             */
-/*   Updated: 2021/02/22 14:59:13 by alboumed         ###   ########.fr       */
+/*   Updated: 2021/02/23 12:06:28 by alboumed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,10 +72,6 @@ int		release(int keycode, tools *tool) //old
 
 int main(int ac, char *av[])
 {
-	int position[2];
-	int mapWidth = 24;
-	int mapHeight = 25;
-	
 	tools tool;
 
 	(void)(ac);
@@ -84,7 +80,10 @@ int main(int ac, char *av[])
 		printf("tous les parametres sont bons\n");
 	}
 	else
+	{
 		printf("error\n");
+		return (0);
+	}
 
 	init_param(&tool);
 	init_window(&tool);

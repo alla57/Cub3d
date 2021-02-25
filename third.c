@@ -6,7 +6,7 @@
 /*   By: alboumed <alboumed@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 14:47:34 by alboumed          #+#    #+#             */
-/*   Updated: 2021/02/22 16:10:57 by alboumed         ###   ########.fr       */
+/*   Updated: 2021/02/25 17:03:03 by alboumed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,7 +211,6 @@ double hit_column_sprite(tools *tool, int column, double *hit_y)
 	double y;
 	int i;
 	int j;
-	double hit[2];
 
 	i = -5;
 	tool->sprite_col = 0;
@@ -395,6 +394,7 @@ void new_calcul(tools *tool, int col, int sprite)
 	double hit_x;
     double hit_y;
 
+	hit_y = 0;
 	if (!sprite)
 	{
 		dist = get_dist(tool, &hit_x, hit_y);
@@ -667,31 +667,105 @@ int		release(int keycode, tools *tool) //old
 	return 1;
 }
 
+int quit(tools *tool)
+{
+	int i;
+
+	i = -1;
+	while(++i <= tool->max_y)
+	{
+		free(tool->map[i]);
+	}
+	free(tool->map);
+	free(tool->no_path);
+	free(tool->so_path);
+	free(tool->we_path);
+	free(tool->ea_path);
+	free(tool->sprite_path);
+	while (1)
+		;
+	exit(0);
+	return (0);
+}
+void	ft_header(tools *tool, int fd)
+{
+  int	tmp;
+
+  write(fd, "BM", 2);
+  tmp = 14 + 40 + 4 * tool->res_x * tool->res_y;
+  write(fd, &tmp, 4);
+  tmp = 0;
+  write(fd, &tmp, 2); 
+  write(fd, &tmp, 2); 
+  tmp = 54;
+  write(fd, &tmp, 4);
+  tmp = 40;
+  write(fd, &tmp, 4);
+  write(fd, &tool->res_x, 4);
+  write(fd, &tool->res_y, 4);
+  tmp = 1;
+  write(fd, &tmp, 2);
+  write(fd, &tool->bits_per_pixel, 2);
+  tmp = 0;
+  write(fd, &tmp, 4);
+  write(fd, &tmp, 4);
+  write(fd, &tmp, 4);
+  write(fd, &tmp, 4);
+  write(fd, &tmp, 4);
+  write(fd, &tmp, 4);
+}
+void save_screen(tools *tool, char *option)
+{
+	int fd;
+	int x;
+	int y;
+
+	x = -1;
+	y = -1;
+	if (ft_strcmp(option, "--save"))
+		return ;
+	if ((fd = open("capture.bmp", O_CREAT | O_RDWR)) == -1)
+		return ;
+	ft_header(tool, fd);
+	// while (++x < tool->res_x)
+	// {
+	// 	y = -1;
+	// 	while (++y < tool->res_y)
+	// 	{
+	// 		write(fd, tool->addr + (y * tool->line_length + x * (tool->bits_per_pixel/8)), 4);
+	// 	}
+	// }
+	write(fd, tool->addr, ((tool->res_y - 1) * tool->line_length + (tool->res_x - 1) * (tool->bits_per_pixel/8)));
+	close(fd);
+	system("chmod 777 capture.bmp");
+}
+
 int main(int ac, char *av[])
 {
-	int position[2];
-	int mapWidth = 24;
-	int mapHeight = 25;
-	
 	tools tool;
 
 	(void)(ac);
-	if (get_map_param(av[1], &tool))
+	if (get_map_param(av[2], &tool))
 	{
 		printf("tous les parametres sont bons\n");
 	}
 	else
+	{
 		printf("error\n");
+		return (0);
+	}
 
 	init_param(&tool);
 	init_window(&tool);
 	create_img_addr(&tool);
 	init_player_pos(&tool);
+	raycasting(&tool, 0);
+	check_sprite(&tool);
+	save_screen(&tool, av[1]);
+	mlx_hook(tool.win_ptr, 17, 0L, quit, &tool);
 	mlx_put_image_to_window(tool.mlx_ptr, tool.win_ptr, tool.img_ptrnew, 0, 0);
 	mlx_hook(tool.win_ptr, 2, 1L<<0, press, &tool);
 	mlx_hook(tool.win_ptr, 3, 1L<<1, release, &tool);
-	//////mlx_hook(tool->win_ptr, 25, 1L<<18, resize, tool);
-	//////mlx_loop_hook(tool->mlx_ptr, apply, tool);
 	mlx_loop(tool.mlx_ptr);
 	return 0;
 }

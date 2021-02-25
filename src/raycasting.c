@@ -6,7 +6,7 @@
 /*   By: alboumed <alboumed@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 16:24:33 by alboumed          #+#    #+#             */
-/*   Updated: 2021/02/22 16:29:42 by alboumed         ###   ########.fr       */
+/*   Updated: 2021/02/23 11:15:36 by alboumed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ void	new_calcul(tools *tool, int col, int sprite)
 	double hit_x;
 	double hit_y;
 
+	hit_y = 0;
 	if (!sprite)
 	{
 		dist = get_dist(tool, &hit_x, hit_y);

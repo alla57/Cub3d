@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alboumed <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: alboumed <alboumed@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/19 09:03:39 by alboumed          #+#    #+#             */
-/*   Updated: 2019/12/14 18:38:08 by alboumed         ###   ########.fr       */
+/*   Updated: 2021/02/24 15:50:04 by alboumed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,9 @@ char	**ft_size_words(const char *s, char c, char **dest)
 				++size_word;
 				++i;
 			}
-			dest[j] = malloc(sizeof(char) * (size_word + 1));
-			j++;
-			if (!dest)
+			if (!(dest[j] = malloc(sizeof(char) * (size_word + 1))))
 				return (NULL);
+			j++;
 		}
 		else
 			i++;

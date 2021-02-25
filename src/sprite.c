@@ -6,7 +6,7 @@
 /*   By: alboumed <alboumed@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 16:19:39 by alboumed          #+#    #+#             */
-/*   Updated: 2021/02/22 16:23:31 by alboumed         ###   ########.fr       */
+/*   Updated: 2021/02/23 11:13:05 by alboumed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ double	hit_column_sprite(tools *tool, int column, double *hit_y)
 	double	y;
 	int		i;
 	int		j;
-	double	hit[2];
 
 	i = -5;
 	tool->sprite_col = 0;

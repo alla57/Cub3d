@@ -6,7 +6,7 @@
 /*   By: alboumed <alboumed@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 15:52:52 by alboumed          #+#    #+#             */
-/*   Updated: 2021/02/22 16:15:52 by alboumed         ###   ########.fr       */
+/*   Updated: 2021/02/23 11:47:25 by alboumed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void			draw_column(double height, int col, double hit_x, tools *tool)
 	{
 		my_mlx_pixel_put(tool, x, y++, tool->c_color);
 	}
-	get_img(tool, x, &y, height, hit_x);
+	get_img(tool, x, &y, height);
 	while (y < tool->res_y)
 	{
 		my_mlx_pixel_put(tool, x, y++, tool->f_color);

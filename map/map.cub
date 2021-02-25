@@ -1,10 +1,10 @@
 R 1000 1000
-NO ./redbrick.xpm
-SO ./eagle.xpm
-WE ./bluestone.xpm
-EA ./greystone.xpm
+NO ./textures/redbrick.xpm
+SO ./textures/eagle.xpm
+WE ./textures/bluestone.xpm
+EA ./textures/greystone.xpm
 
-S ./barrel.xpm
+S ./textures/barrel.xpm
 F 255,155,100
 C 120,255,255
 

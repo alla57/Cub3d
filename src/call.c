@@ -1,7 +1,7 @@
 #include "../include/cub3d.h"
 #include "../Libft/libft.h"
 #include <math.h>
-
+/*
 void struct_init(tools *tool)
 {
 	tool->sprite_path = "";
@@ -25,7 +25,7 @@ void struct_init(tools *tool)
 	//tool->img_ptrblank = mlx_new_image(tool->mlx_ptr, 1000, 1000);
 	tool->speed = 0;
 }
-
+*/
 void	ft_error(int a)/////////////////////////////////////////////////////
 {
 	if (a == 1)
@@ -55,7 +55,7 @@ int get_north_texture(char **no_texture, tools *tool)
 	if (ft_strcmp(no_texture[0], "NO"))
 		return (0);
 	if (check_path_format(no_texture[1]) == 1)
-		tool->no_path = no_texture[1];
+		tool->no_path = ft_strdup(no_texture[1]);
 	else
 		return (0);
 	return (1);
@@ -74,7 +74,7 @@ int get_south_texture(char **so_texture, tools *tool)
 	if (ft_strcmp(so_texture[0], "SO"))
 		return (0);
 	if (check_path_format(so_texture[1]) == 1)
-		tool->so_path = so_texture[1];
+		tool->so_path = ft_strdup(so_texture[1]);
 	else
 		return (0);
 	return (1);
@@ -93,7 +93,7 @@ int get_east_texture(char **ea_texture, tools *tool)
 	if (ft_strcmp(ea_texture[0], "EA"))
 		return (0);
 	if (check_path_format(ea_texture[1]) == 1)
-		tool->ea_path = ea_texture[1];
+		tool->ea_path = ft_strdup(ea_texture[1]);
 	else
 		return (0);
 	return (1);
@@ -112,7 +112,7 @@ int get_west_texture(char **we_texture, tools *tool)
 	if (ft_strcmp(we_texture[0], "WE"))
 		return (0);
 	if (check_path_format(we_texture[1]) == 1)
-		tool->we_path = we_texture[1];
+		tool->we_path = ft_strdup(we_texture[1]);
 	else
 		return (0);
 	return (1);
@@ -131,7 +131,7 @@ int get_sprite(char **sprite, tools *tool)
 	if (ft_strcmp(sprite[0], "S"))
 		return (0);
 	if (check_path_format(sprite[1]) == 1)
-		tool->sprite_path = sprite[1];
+		tool->sprite_path = ft_strdup(sprite[1]);
 	else
 		return (0);
 	return (1);
@@ -158,6 +158,10 @@ int get_rgb(char *colors)
 	}
 	rgb[0] <<= 16;
 	rgb[1] <<= 8;
+	i = -1;
+	while (temp[++i])
+		free(temp[i]);
+	free(temp);
 	return (rgb[0] | rgb[1] | rgb[2]);
 }
 
@@ -223,10 +227,22 @@ int get_res(char **res, tools *tool)
 	return (1);
 }
 
+void free_params(char **params)
+{
+	int i;
+
+	i = -1;
+	while(params[++i])
+		free(params[i]);
+	free(params);
+}
+
 int	param_check(char **params, tools *tool)
 {
 	static int	a = 0;
+	int i;
 
+	i = -1;
 	if (a == 255)
 		return (1);
 	else if (get_res(params, tool))
@@ -245,6 +261,7 @@ int	param_check(char **params, tools *tool)
 		a |= (1 << 6);
 	else if (get_top_color(params, tool))
 		a |= (1 << 7);
+	free_params(params);
 	return (a == 255? 1 : 0);
 }
 
@@ -343,7 +360,7 @@ char	*realloc_extended_map(char **str, int max)
 	if (!((*str) = malloc(sizeof(char) * (max + 1))))
 		return (NULL);
 	ft_strcpy_vtwo(*str, temp);
-	while (i <= max)
+	while (i < max) // i <= max
 		(*str)[i++] = ' ';
 	(*str)[i] = '\0';
 	free(temp);
@@ -393,9 +410,13 @@ int realloc_map(tools *tool)
 	temp = tool->map;
 	if (!(new_map = malloc(sizeof(char*) * n)))
 		return (0);
-	while (++i < n && n > 1)
-		new_map[i] = tool->map[i];
 	tool->map = new_map;
+	while (++i < n - 1 && n > 1)
+	{
+		new_map[i] = ft_strdup(temp[i]);
+		free(temp[i]);
+		//new_map[i] = tool->map[i];
+	}
 	if (n > 1)
 		free(temp);
 	++n;
@@ -456,6 +477,7 @@ int skip_empty_lines(int fd, char **line)
 	get_next_line(fd, &*line);
 	while (empty_line(*line))
 	{
+		free(*line);
 		if (get_next_line(fd, &*line) != 1)
 			return (0);
 	}
@@ -477,8 +499,10 @@ int map_master(int fd, tools *tool)
 		max_x = max_x < ft_strlen(line) ? ft_strlen(line) : max_x;
 		realloc_map(tool);
 		tool->map[j++] = ft_strdup(line);
+		free(line);
 		get_next_line(fd, &line);
 	}
+	free(line);
 	return (map_master_two(j, max_x, tool));
 }
 
@@ -494,10 +518,12 @@ int get_map_param(char *path, tools *tool)
 	params = ft_split(line, ' ');
 	while (!param_check(params, tool))
 	{
+		free(line);
 		if (get_next_line(fd, &line) != 1)
 			return (0);
 		params = ft_split(line, ' ');
 	}
+	free(line);
 	if (!map_master(fd, tool))
 		return (0);
 	close(fd);

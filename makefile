@@ -10,7 +10,23 @@ LIBFTD = Libft/libft.a
 
 SRC_PATH =	get_next_line.c			\
 			get_next_line_utils.c	\
-			call.c					\
+			calcul.c				\
+			hit_1.c					\
+			hit_2.c					\
+			init.c					\
+			main.c					\
+			move.c					\
+			pixel.c					\
+			raycasting.c			\
+			rotate.c				\
+			sprite.c				\
+			sprite_2.c				\
+			check_map_2.c			\
+			check_map.c				\
+			check_params.c			\
+			get_color_params.c		\
+			get_texture.c			\
+			#call.c					\
 
 SRC = $(addprefix src/,$(SRC_PATH))
 
