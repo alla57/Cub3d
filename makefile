@@ -24,8 +24,10 @@ SRC_PATH =	get_next_line.c			\
 			check_map_2.c			\
 			check_map.c				\
 			check_params.c			\
+			check_params_2.c		\
 			get_color_params.c		\
 			get_texture.c			\
+			save_bmp.c				\
 			#call.c					\
 
 SRC = $(addprefix src/,$(SRC_PATH))

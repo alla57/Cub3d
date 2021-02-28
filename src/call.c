@@ -240,9 +240,7 @@ void free_params(char **params)
 int	param_check(char **params, tools *tool)
 {
 	static int	a = 0;
-	int i;
 
-	i = -1;
 	if (a == 255)
 		return (1);
 	else if (get_res(params, tool))

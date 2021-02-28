@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   third.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alboumed <alboumed@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 14:47:34 by alboumed          #+#    #+#             */
-/*   Updated: 2021/02/25 17:03:03 by alboumed         ###   ########.fr       */
+/*   Updated: 2021/02/26 15:33:12 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//#include "./minilibx-linux/mlx.h"
-#include "minilibx_opengl_20191021/mlx.h"
+#include "./minilibx-linux/mlx.h"
+//#include "minilibx_opengl_20191021/mlx.h"
 #include <stdio.h>
 #include <unistd.h>
 #include "include/cub3d.h"
@@ -33,7 +33,7 @@ void init_param(tools *tool)
 
 void init_window(tools *tool)
 {
-	tool->title = "Cub3d";
+	tool->title = "cub3d";
 	tool->mlx_ptr = mlx_init();
 	tool->win_ptr = mlx_new_window(tool->mlx_ptr, tool->res_x, tool->res_y, tool->title);
 }
@@ -632,17 +632,19 @@ void move_player(tools *tool)
 
 int 	press(int keycode, tools *tool) //old
 {
-	if (keycode == 13) //13 122
+	if (keycode == 65307)
+		quit(tool);
+	if (keycode == 122) //13 122
 		tool->keyup = 1;
-	if (keycode == 0) //0 113
+	if (keycode == 113) //0 113
 		tool->keyleft = 1;
-	if (keycode == 1) //1 115
+	if (keycode == 115) //1 115
 		tool->keydown = 1;
-	if (keycode == 2) //2 100
+	if (keycode == 100) //2 100
 		tool->keyright = 1;
-	if (keycode == 123) //123 65361
+	if (keycode == 65361) //123 65361
 		tool->rotate_left = 1;
-	if (keycode == 124) //124 65363
+	if (keycode == 65363) //124 65363
 		tool->rotate_right = 1;
 	move_player(tool);
 	//printf("je suis dans press et le keycode est %d\n", keycode);
@@ -651,19 +653,19 @@ int 	press(int keycode, tools *tool) //old
 
 int		release(int keycode, tools *tool) //old
 {
-	if (keycode == 13) //13 122
+	if (keycode == 122) //13 122
 		tool->keyup = 0;
-	if (keycode == 0) //0 113
+	if (keycode == 113) //0 113
 		tool->keyleft = 0;
-	if (keycode == 1) //1 115
+	if (keycode == 115) //1 115
 		tool->keydown = 0;
-	if (keycode == 2) //2 100
+	if (keycode == 100) //2 100
 		tool->keyright = 0;
-	if (keycode == 123) //123 65361
+	if (keycode == 65361) //123 65361
 		tool->rotate_left = 0;
-	if (keycode == 124) //124 65363
+	if (keycode == 65363) //124 65363
 		tool->rotate_right = 0;
-	printf("keyrelease\n");
+	printf("keyrelease %d\n", keycode);
 	return 1;
 }
 
@@ -682,8 +684,8 @@ int quit(tools *tool)
 	free(tool->we_path);
 	free(tool->ea_path);
 	free(tool->sprite_path);
-	while (1)
-		;
+	// while (1)
+	// 	;
 	exit(0);
 	return (0);
 }
@@ -745,13 +747,13 @@ int main(int ac, char *av[])
 	tools tool;
 
 	(void)(ac);
-	if (get_map_param(av[2], &tool))
+	if (get_map_param(av[1], &tool))
 	{
 		printf("tous les parametres sont bons\n");
 	}
 	else
 	{
-		printf("error\n");
+		printf("error\nparameters error");
 		return (0);
 	}
 
@@ -761,9 +763,11 @@ int main(int ac, char *av[])
 	init_player_pos(&tool);
 	raycasting(&tool, 0);
 	check_sprite(&tool);
-	save_screen(&tool, av[1]);
-	mlx_hook(tool.win_ptr, 17, 0L, quit, &tool);
+	if (av[2])
+		save_screen(&tool, av[2]);
+	// mlx_hook(tool.win_ptr, 17, 0L, quit, &tool);
 	mlx_put_image_to_window(tool.mlx_ptr, tool.win_ptr, tool.img_ptrnew, 0, 0);
+	mlx_hook(tool.win_ptr, 33, 1L << 17, quit, &tool);
 	mlx_hook(tool.win_ptr, 2, 1L<<0, press, &tool);
 	mlx_hook(tool.win_ptr, 3, 1L<<1, release, &tool);
 	mlx_loop(tool.mlx_ptr);

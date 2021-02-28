@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <math.h>
-//#include "../minilibx-linux/mlx.h"
-#include "../minilibx_opengl_20191021/mlx.h"
+#include "../minilibx-linux/mlx.h"
+//#include "../minilibx_opengl_20191021/mlx.h"
 //#include "get_next_line.h"
 #include "../Libft/libft.h"
 
@@ -82,7 +82,11 @@ typedef struct
     int a;
 }calcul;
 
+void			ft_header(tools *tool, int fd);
+void			save_screen(tools *tool, char *option);
+int				quit(tools *tool);
 void			free_params(char **params);
+int				check_path_format(char *path);
 double			get_dist_sprite(tools *tool, double *hit_x, double hit_y);
 double			hit_row_sprite(tools *tool, int row, double *hit_x);
 void			hit_row_sprite_2(tools *tool, int i, int j, double *hit_x);
