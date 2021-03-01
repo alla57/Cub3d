@@ -40,10 +40,12 @@ all : minilibx libft $(NAME)
 clean :
 	$(RM) $(OBJ)
 	make clean -C Libft
+	make clean -C minilibx-linux
 
 fclean : clean
 	$(RM) $(NAME) cub3D
 	make fclean -C Libft
+	make clean -C minilibx-linux
 
 $(NAME) : $(OBJ)
 	ar rc $(NAME) $(OBJ)
