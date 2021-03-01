@@ -35,14 +35,14 @@ SRC = $(addprefix src/,$(SRC_PATH))
 
 OBJ	= $(SRC:.c=.o)
 
-all : libft $(NAME)
+all : minilibx libft $(NAME)
 
 clean :
 	$(RM) $(OBJ)
 	make clean -C Libft
 
 fclean : clean
-	$(RM) $(NAME)
+	$(RM) $(NAME) cub3D
 	make fclean -C Libft
 
 $(NAME) : $(OBJ)
@@ -51,6 +51,9 @@ $(NAME) : $(OBJ)
 
 libft :
 	make -C Libft
+
+minilibx :
+	make -C minilibx-linux
 
 re : fclean all
 
