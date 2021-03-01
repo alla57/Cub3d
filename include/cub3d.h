@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/01 16:25:37 by user42            #+#    #+#             */
-/*   Updated: 2021/03/01 16:52:49 by user42           ###   ########.fr       */
+/*   Updated: 2021/03/01 17:05:29 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,71 +24,71 @@
 
 typedef struct
 {
-	void	*mlx_ptr;
-	void	*win_ptr;
-	void	*img_ptr_no;
-	void	*img_ptr_so;
-	void	*img_ptr_ea;
-	void	*img_ptr_we;
-	void	*img_ptr_sp;
-	void	*texture;
-	void	*img_ptrnew;
-	char	*no_path;
-	char	*so_path;
-	char	*ea_path;
-	char	*we_path;
-	char	*sprite_path;
-	int		sprite_col;
-	int		sprite_row;
-	char	**map;
-	int		res_x;
-	int		res_y;
-	int		f_color;
-	int		c_color;
-	int		width;
-	int		height;
-	char	*title;
-	int		keyup;
-	int		keyleft;
-	int		keydown;
-	int		keyright;
-	double	speed;
-	double	posx;
-	double	posy;
-	double	dirx;
-	double	diry;
-	double	time;
-	double	oldtime;
-	int		pos_player[2];
-	double	dir;
-	char	*addr;
-	char	*addr_texture;
-	int		bits_per_pixel;
-	int		line_length;
-	int		endian;
-	int		bits_per_pixel_2;
-	int		line_length_2;
-	int		endian_2;
-	int		max_y;
-	int		case_len;
-	int		rotate_left;
-	int		rotate_right;
-	double	ray_dir;
-	double	hit[3];
-}			t_tools;
+	int			keyup;
+	void		*mlx_ptr;
+	void		*win_ptr;
+	void		*img_ptr_no;
+	void		*img_ptr_so;
+	void		*img_ptr_ea;
+	void		*img_ptr_we;
+	void		*img_ptr_sp;
+	void		*texture;
+	void		*img_ptrnew;
+	char		*no_path;
+	char		*so_path;
+	char		*ea_path;
+	char		*we_path;
+	char		*sprite_path;
+	int			sprite_col;
+	int			sprite_row;
+	char		**map;
+	int			res_x;
+	int			res_y;
+	int			f_color;
+	int			c_color;
+	int			width;
+	int			height;
+	char		*title;
+	int			keyleft;
+	int			keydown;
+	int			keyright;
+	double		speed;
+	double		posx;
+	double		posy;
+	double		dirx;
+	double		diry;
+	double		time;
+	double		oldtime;
+	int			pos_player[2];
+	double		dir;
+	char		*addr;
+	char		*addr_texture;
+	int			bits_per_pixel;
+	int			line_length;
+	int			endian;
+	int			bits_per_pixel_2;
+	int			line_length_2;
+	int			endian_2;
+	int			max_y;
+	int			case_len;
+	int			rotate_left;
+	int			rotate_right;
+	double		ray_dir;
+	double		hit[3];
+}				t_tools;
 
 typedef struct
 {
-	int		x_src;
-	int		y_src;
-	int		x_dest;
-	int		y_dest;
-	int		color;
-	double	fx;
-	double	fy;
-	int		width;
-	int		a;
-}			t_calcul;
+	int			x_src;
+	int			y_src;
+	int			x_dest;
+	int			y_dest;
+	int			color;
+	double		fx;
+	double		fy;
+	int			width;
+	int			a;
+}				t_calcul;
 
 int				get_next_line(int fd, char **line);
 void			ft_header(tools *tool, int fd);
