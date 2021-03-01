@@ -1,22 +1,30 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cub3d.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/01 16:25:37 by user42            #+#    #+#             */
+/*   Updated: 2021/03/01 16:52:49 by user42           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef CUB3D_H
 
 # define CUB3D_H
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <math.h>
-#include "../minilibx-linux/mlx.h"
-//#include "../minilibx_opengl_20191021/mlx.h"
-//#include "get_next_line.h"
-#include "../Libft/libft.h"
-
-int		get_next_line(int fd, char **line);
+# include <stdio.h>
+# include <unistd.h>
+# include <stdlib.h>
+# include <fcntl.h>
+# include <math.h>
+# include "../minilibx-linux/mlx.h"
+# include "../Libft/libft.h"
 
 typedef struct
 {
-	void    *mlx_ptr;
+	void	*mlx_ptr;
 	void	*win_ptr;
 	void	*img_ptr_no;
 	void	*img_ptr_so;
@@ -24,7 +32,7 @@ typedef struct
 	void	*img_ptr_we;
 	void	*img_ptr_sp;
 	void	*texture;
-	void	*img_ptrnew;//////////// a supprimer plus tard
+	void	*img_ptrnew;
 	char	*no_path;
 	char	*so_path;
 	char	*ea_path;
@@ -37,8 +45,8 @@ typedef struct
 	int		res_y;
 	int		f_color;
 	int		c_color;
-	int		width; // a supprimer
-	int		height; //a supprimer
+	int		width;
+	int		height;
 	char	*title;
 	int		keyup;
 	int		keyleft;
@@ -53,35 +61,36 @@ typedef struct
 	double	oldtime;
 	int		pos_player[2];
 	double	dir;
-	char *addr;
-	char *addr_texture;
-	int bits_per_pixel;
-	int line_length;
-	int endian;
-	int bits_per_pixel_2;
-	int line_length_2;
-	int endian_2;
-	int max_y;
-	int case_len;
-	int rotate_left;
-	int rotate_right;
-	double ray_dir;
-	double hit[3];
-}tools;
+	char	*addr;
+	char	*addr_texture;
+	int		bits_per_pixel;
+	int		line_length;
+	int		endian;
+	int		bits_per_pixel_2;
+	int		line_length_2;
+	int		endian_2;
+	int		max_y;
+	int		case_len;
+	int		rotate_left;
+	int		rotate_right;
+	double	ray_dir;
+	double	hit[3];
+}			t_tools;
 
 typedef struct
 {
-	int x_src;
-	int y_src;
-	int x_dest;
-	int y_dest;
-	int color;
-	double fx;
-	double fy;
-	int width;
-    int a;
-}calcul;
+	int		x_src;
+	int		y_src;
+	int		x_dest;
+	int		y_dest;
+	int		color;
+	double	fx;
+	double	fy;
+	int		width;
+	int		a;
+}			t_calcul;
 
+int				get_next_line(int fd, char **line);
 void			ft_header(tools *tool, int fd);
 void			save_screen(tools *tool, char *option);
 int				quit(tools *tool);
@@ -112,7 +121,7 @@ void			move_backward(tools *tool);
 void			move_forward(tools *tool);
 int				main(int ac, char *av[]);
 int				release(int keycode, tools *tool);
-int 			press(int keycode, tools *tool);
+int				press(int keycode, tools *tool);
 void			move_player(tools *tool);
 void			init_player_pos(tools *tool);
 void			create_img_addr(tools *tool);
@@ -156,6 +165,5 @@ int				map_master_two(int j, int max_x, tools *tool);
 int				skip_empty_lines(int fd, char **line);
 int				map_master(int fd, tools *tool);
 int				get_map_param(char *path, tools *tool);
-
 
 #endif
