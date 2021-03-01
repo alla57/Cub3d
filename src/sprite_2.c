@@ -12,7 +12,7 @@
 
 #include "../include/cub3d.h"
 
-void rotate_sprite(tools *tool, int i, int j)
+void	rotate_sprite(tools *tool, int i, int j)
 {
 	double x;
 	double y;
@@ -33,7 +33,7 @@ void rotate_sprite(tools *tool, int i, int j)
 	}
 }
 
-void hit_sprite(tools *tool, int i, int j)
+void	hit_sprite(tools *tool, int i, int j)
 {
 	double x;
 	double y;
@@ -41,7 +41,9 @@ void hit_sprite(tools *tool, int i, int j)
 
 	x = (double)i + 0.5;
 	y = (double)j + 0.5;
-	t = (cos(tool->dir) * tool->posy - sin(tool->dir) * x + sin(tool->dir) * tool->posx - cos(tool->dir) * y) / (-1 * (cos(tool->dir) * cos(tool->dir) + sin(tool->dir) * sin(tool->dir)));
+	t = (cos(tool->dir) * tool->posy - sin(tool->dir) * x + sin(tool->dir) *
+	tool->posx - cos(tool->dir) * y) / (-1 * (cos(tool->dir) * cos(tool->dir) +
+	sin(tool->dir) * sin(tool->dir)));
 	x = x - sin(tool->dir) * t;
 	y = y - cos(tool->dir) * t;
 	if (x < (double)i)

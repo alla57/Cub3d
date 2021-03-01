@@ -46,23 +46,19 @@ void	save_screen(tools *tool, char *option)
 	int x;
 	int y;
 
-	x = -1;
-	y = -1;
+	y = tool->res_y;
 	if (ft_strcmp(option, "--save"))
 		return ;
 	if ((fd = open("capture.bmp", O_CREAT | O_RDWR)) == -1)
 		return ;
 	ft_header(tool, fd);
-	while (++x < tool->res_x)
+	while (--y >= 0)
 	{
-		y = -1;
-		while (++y < tool->res_y)
-		{
-			write(fd, tool->addr + (y * tool->line_length + x * (tool->bits_per_pixel/8)), 4);
-		}
+		x = -1;
+		while (++x < tool->res_x)
+			write(fd, tool->addr + (y * tool->line_length + x *
+			(tool->bits_per_pixel / 8)), 4);
 	}
-	//write(fd, tool->addr, ((tool->res_y - 1) * tool->line_length +
-	//(tool->res_x - 1) * (tool->bits_per_pixel / 8)));
 	close(fd);
 	system("chmod 777 capture.bmp");
 	quit(tool);

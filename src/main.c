@@ -12,7 +12,7 @@
 
 #include "../include/cub3d.h"
 
-void move_player(tools *tool)
+void	move_player(tools *tool)
 {
 	if (tool->keyup && !hit_up(tool))
 		move_forward(tool);
@@ -26,15 +26,17 @@ void move_player(tools *tool)
 		rotate_left(tool);
 	if (tool->rotate_right)
 		rotate_right(tool);
-	if (tool->keyup || tool->keydown || tool->keyleft || tool->keyright || tool->rotate_left || tool->rotate_right)
+	if (tool->keyup || tool->keydown || tool->keyleft || tool->keyright ||
+	tool->rotate_left || tool->rotate_right)
 	{
 		raycasting(tool, 0);
 		check_sprite(tool);
-		mlx_put_image_to_window(tool->mlx_ptr, tool->win_ptr, tool->img_ptrnew, 0, 0);
+		mlx_put_image_to_window(tool->mlx_ptr, tool->win_ptr,
+		tool->img_ptrnew, 0, 0);
 	}
 }
 
-int 	press(int keycode, tools *tool)
+int		press(int keycode, tools *tool)
 {
 	if (keycode == 65307)
 		quit(tool);
@@ -71,12 +73,12 @@ int		release(int keycode, tools *tool)
 	return (1);
 }
 
-int quit(tools *tool)
+int		quit(tools *tool)
 {
 	int i;
 
 	i = -1;
-	while(++i <= tool->max_y)
+	while (++i <= tool->max_y)
 		free(tool->map[i]);
 	free(tool->map);
 	free(tool->no_path);
@@ -90,7 +92,7 @@ int quit(tools *tool)
 	return (0);
 }
 
-int main(int ac, char *av[])
+int		main(int ac, char *av[])
 {
 	tools tool;
 
@@ -110,8 +112,8 @@ int main(int ac, char *av[])
 		save_screen(&tool, av[2]);
 	mlx_put_image_to_window(tool.mlx_ptr, tool.win_ptr, tool.img_ptrnew, 0, 0);
 	mlx_hook(tool.win_ptr, 33, 1L << 17, quit, &tool);
-	mlx_hook(tool.win_ptr, 2, 1L<<0, press, &tool);
-	mlx_hook(tool.win_ptr, 3, 1L<<1, release, &tool);
+	mlx_hook(tool.win_ptr, 2, 1L << 0, press, &tool);
+	mlx_hook(tool.win_ptr, 3, 1L << 1, release, &tool);
 	mlx_loop(tool.mlx_ptr);
 	return (0);
 }
