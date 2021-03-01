@@ -8,6 +8,10 @@ NAME = cub3d.a
 
 LIBFTD = Libft/libft.a
 
+CUB3DLIB = cub3d.a
+
+MINILIBX = -L./minilibx-linux -lmlx -lXext -lX11 -lm
+
 SRC_PATH =	get_next_line.c			\
 			get_next_line_utils.c	\
 			calcul.c				\
@@ -28,7 +32,6 @@ SRC_PATH =	get_next_line.c			\
 			get_color_params.c		\
 			get_texture.c			\
 			save_bmp.c				\
-			#call.c					\
 
 SRC = $(addprefix src/,$(SRC_PATH))
 
@@ -46,6 +49,7 @@ fclean : clean
 
 $(NAME) : $(OBJ)
 	ar rc $(NAME) $(OBJ)
+	$(CC) -o cub3D src/main.c $(CUB3DLIB) $(LIBFTD) $(MINILIBX)
 
 libft :
 	make -C Libft
