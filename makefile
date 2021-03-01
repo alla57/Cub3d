@@ -8,8 +8,6 @@ NAME = cub3d.a
 
 LIBFTD = Libft/libft.a
 
-CUB3DLIB = cub3d.a
-
 MINILIBX = -L./minilibx-linux -lmlx -lXext -lX11 -lm
 
 SRC_PATH =	get_next_line.c			\
@@ -49,7 +47,7 @@ fclean : clean
 
 $(NAME) : $(OBJ)
 	ar rc $(NAME) $(OBJ)
-	$(CC) -o cub3D src/main.c $(CUB3DLIB) $(LIBFTD) $(MINILIBX)
+	$(CC) -o cub3D src/main.c $(NAME) $(LIBFTD) $(MINILIBX)
 
 libft :
 	make -C Libft
