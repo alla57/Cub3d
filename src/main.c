@@ -86,8 +86,6 @@ int		quit(tools *tool)
 	free(tool->we_path);
 	free(tool->ea_path);
 	free(tool->sprite_path);
-	/*while (1)
-		;*/
 	exit(0);
 	return (0);
 }
