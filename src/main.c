@@ -40,9 +40,9 @@ int		press(int keycode, tools *tool)
 {
 	if (keycode == 65307)
 		quit(tool);
-	if (keycode == 122)
+	if (keycode == 119)
 		tool->keyup = 1;
-	if (keycode == 113)
+	if (keycode == 97)
 		tool->keyleft = 1;
 	if (keycode == 115)
 		tool->keydown = 1;
@@ -58,9 +58,9 @@ int		press(int keycode, tools *tool)
 
 int		release(int keycode, tools *tool)
 {
-	if (keycode == 122)
+	if (keycode == 119)
 		tool->keyup = 0;
-	if (keycode == 113)
+	if (keycode == 97)
 		tool->keyleft = 0;
 	if (keycode == 115)
 		tool->keydown = 0;
@@ -70,6 +70,7 @@ int		release(int keycode, tools *tool)
 		tool->rotate_left = 0;
 	if (keycode == 65363)
 		tool->rotate_right = 0;
+	printf("keycode = %d\n", keycode);
 	return (1);
 }
 
